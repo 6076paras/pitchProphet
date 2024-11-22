@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "costomFPL"
+version = "0.1.0"
+description = ""
+authors = ["6076paras <47757847+6076paras@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+pre-commit = "^4.0.1"
+flake8 = "^7.1.1"
+black = "^24.10.0"
+mypy = "^1.13.0"
+isort = "^5.13.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
