@@ -10,8 +10,17 @@ def make_URL(config):
     """
     print("Select data...")
     season = input("Which season? [2024-2025, 2023-2022]: ")
-    league = input("League? [Premier League, Bundesliga]: ")
-    return season, league
+    league = input("League? [Premier-League, Bundesliga]: ")
+
+    if league == "Premier-League":
+        league_id = "9"
+
+    if league == "Bundesliga":
+        league_id = "20"
+
+    url = f"https://fbref.com/en/comps/{league_id}/{season}/schedule/{season}-{league}-Scores-and-Fixtures"
+
+    return url, season, league
 
 
 def test_pandas(config):
