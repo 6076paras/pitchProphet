@@ -1,5 +1,7 @@
+import re
 import sys
 
+import h5py
 import pandas as pd
 import requests
 import yaml
@@ -45,13 +47,33 @@ def soup_URL(url, season, league):
     return match_links
 
 
-def get_data(match_links):
+def get_data(match_links, league, season):
+    # with h5py.File(f"{league}-{season}.h5","w") as file:
+    # grp1 = file.create_group("Game information")
+    # grp2 = file.create_group("Player information")
     for match_link in match_links:
         tables = pd.read_html(match_link)
-        print(tables[2])
-        sys.exit()
-        for table in tables:
-            print(table)
+
+        # player data
+        home_p_df = tables[3].columns.droplevel(0)
+        home_gk_df = tables[9].columns.droplevel(0)
+        away_p_df = tables[10].columns.droplevel(0)
+        away_gk_df = tables[16].columns.droplevel(0)
+
+        # TODO: game data
+        pattern = r"/en/matches/([a-f0-9]+)/(.*?)-(.*?)-(\w+\s\d{1,2}-\d{4})"
+        match = re.search(pattern, match_link)
+
+        if match:
+            match_id = match.group(1)
+            home_team = match.group(2)
+            away_team = match.group(3)
+            date = match.group(4)
+
+        game_df = pd.DataFrame(
+            {"Home team": home_team, "Away team": away_team, "Date": date}
+        )
+        print(game_df)
     return
 
 
@@ -64,7 +86,7 @@ def main():
         "Premier-League",
         "2023-2024",
     )
-    get_data(soup_URL(url, season, league))
+    get_data(soup_URL(url, season, league), season, league)
     return
 
 
