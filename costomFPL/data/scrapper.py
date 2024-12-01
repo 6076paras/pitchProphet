@@ -53,7 +53,7 @@ def test_pandas(config):
     return
 
 
-if __name__ == "__main__":
+def main():
     path = "/Users/paraspokharel/Programming/costomFPL/costomFPL/config/dataVars.yaml"
     with open(path, "r") as file:
         config = yaml.safe_load(file)
@@ -63,3 +63,8 @@ if __name__ == "__main__":
         "2024-2025",
     )
     print(soup_URL(url, season, league)[0:5])
+    return
+
+
+if __name__ == "__main__":
+    main()
