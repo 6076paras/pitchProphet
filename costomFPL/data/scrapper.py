@@ -45,11 +45,13 @@ def soup_URL(url, season, league):
     return match_links
 
 
-def test_pandas(config):
-    for url in config["url"]:
-        tables = pd.read_html(url)
+def get_data(match_links):
+    for match_link in match_links:
+        tables = pd.read_html(match_link)
+        print(tables[2])
+        sys.exit()
         for table in tables:
-            print(table.dtypes)
+            print(table)
     return
 
 
@@ -58,11 +60,11 @@ def main():
     with open(path, "r") as file:
         config = yaml.safe_load(file)
     url, league, season = (
-        "https://fbref.com/en/comps/9/Premier-League/schedule/2023-2024-Premier_League-Scores-and-Fixtures",
+        "https://fbref.com/en/comps/9/2023-2024/schedule/2023-2024-Premier-League-Scores-and-Fixtures",
         "Premier-League",
-        "2024-2025",
+        "2023-2024",
     )
-    print(soup_URL(url, season, league)[0:5])
+    get_data(soup_URL(url, season, league))
     return
 
 
