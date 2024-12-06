@@ -1,3 +1,4 @@
 *monkeytype.sqlite3
 *.h5
 *ipynb_checkpoint*
+/costomFPL/data/__pycache__
