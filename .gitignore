@@ -1,5 +1,6 @@
 *monkeytype.sqlite3
 *.h5
 *ipynb_checkpoint*
-/costomFPL/data/__pycache__
+/costomFPL/data/__pycache__/*
 *.json
+*.pyc

@@ -63,44 +63,27 @@ def get_data(match_links, league, season):
             away_gk_df = tables[16]
             away_gk_df.columns = away_gk_df.columns.droplevel(0)
 
-            # store in json
-            data_dict = {
-                "Home Team": {
-                    "Player Data": home_p_df.to_dict(orient="records"),
-                    "Goalkeeper Data": home_gk_df.to_dict(orient="records"),
-                },
-                "Away Team": {
-                    "Player Data": away_p_df.to_dict(orient="records"),
-                    "Goalkeeper Data": away_gk_df.to_dict(orient="records"),
-                },
-            }
-            json.dump(data_dict, json_file, indent=4)
-
             # extract game data
             req_obj = requests.get(match_link)
             parse_html = BeautifulSoup(req_obj.content, "html.parser")
 
-            title = parse_html.find("title").text
-            match_week = parse_html.find(string=re.compile("Matchweek \d+"))
-            # match_week = re.sub(r'\(|\)', '',match_week).strip()
-            match_info = re.search(
-                r"([A-Za-z\s]+) vs\. ([A-Za-z\s]+) Match Report &ndash; ([A-Za-z]+ \d{1,2}, \d{4})",
-                title,
-            )
+            match_week = parse_html.find(string=re.compile(r"Matchweek \d+"))
+            match_week = re.sub(r"\D", "", match_week)
 
-            if match_info:
-                home_team = match_info.group(1)
-                away_team = match_info.group(2)
-                match_date = match_info.group(3)
+            # TODO: score, home_team and away team info
 
-                # Print extracted data
-                print(f"Home Team: {home_team}")
-                print(f"Away Team: {away_team}")
-                print(f"Match Date: {match_date}")
-            else:
-                print("Match information could not be extracted.")
-            break
-    sys.exit()
+            # store in json
+            data_dict = {
+                "Game Data": {"Matchweek": int(match_week)},
+                "Player Data": {
+                    "Home Team": home_p_df.to_dict(orient="records"),
+                    "Home Team GK ": home_gk_df.to_dict(orient="records"),
+                    "Away Team": away_p_df.to_dict(orient="records"),
+                    "Away Team GK": away_gk_df.to_dict(orient="records"),
+                },
+            }
+            json.dump(data_dict, json_file, indent=4)
+
     return
 
 
