@@ -6,7 +6,7 @@ authors = ["6076paras <47757847+6076paras@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-get-data = "costomFPL.data.scrapper:main"
+get-data = "costomFPL.data.fbref_scrapper:main"
 
 [tool.poetry.dependencies]
 python = "^3.13"
