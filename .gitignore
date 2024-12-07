@@ -4,3 +4,4 @@
 /costomFPL/data/__pycache__/*
 *.json
 *.pyc
+*.csv
