@@ -76,20 +76,31 @@ def get_data(match_links, league, season):
             }
             json.dump(data_dict, json_file, indent=4)
 
-        # TODO: game data
+            # extract game data
+            req_obj = requests.get(match_link)
+            parse_html = BeautifulSoup(req_obj.content, "html.parser")
 
-        # pattern = r"/en/matches/([a-f0-9]+)/(.*?)-(.*?)-(\w+\s\d{1,2}-\d{4})"
-        # match = re.search(pattern, match_link)
+            title = parse_html.find("title").text
+            match_week = parse_html.find(string=re.compile("Matchweek \d+"))
+            # match_week = re.sub(r'\(|\)', '',match_week).strip()
+            match_info = re.search(
+                r"([A-Za-z\s]+) vs\. ([A-Za-z\s]+) Match Report &ndash; ([A-Za-z]+ \d{1,2}, \d{4})",
+                title,
+            )
 
-        # if match:
-        #     match_id = match.group(1)
-        #     home_team = match.group(2)
-        #     away_team = match.group(3)
-        #     date = match.group(4)
+            if match_info:
+                home_team = match_info.group(1)
+                away_team = match_info.group(2)
+                match_date = match_info.group(3)
 
-        # game_df = pd.DataFrame(
-        #     {"Home team": home_team, "Away team": away_team, "Date": date}
-        # )
+                # Print extracted data
+                print(f"Home Team: {home_team}")
+                print(f"Away Team: {away_team}")
+                print(f"Match Date: {match_date}")
+            else:
+                print("Match information could not be extracted.")
+            break
+    sys.exit()
     return
 
 
