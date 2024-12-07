@@ -83,6 +83,7 @@ def get_data(match_links, league, season):
                 },
             }
             json.dump(data_dict, json_file, indent=4)
+            time.sleep(3)
 
     return
 
