@@ -1,3 +1,4 @@
+import json
 import re
 import sys
 
@@ -48,42 +49,47 @@ def soup_URL(url, season, league):
 
 
 def get_data(match_links, league, season):
-    # with h5py.File(f"{league}-{season}.h5","w") as file:
-    # grp1 = file.create_group("Game information")
-    # grp2 = file.create_group("Player information")
-    with pd.HDFStore(f"{league}-{season}.h5", mode="w") as file:
+    with open(f"costomFPL/data/FBRef-{league}-{season}.json", "w") as json_file:
         for match_link in match_links:
             tables = pd.read_html(match_link)
 
             # player data
-            home_p_df = tables[3].columns.droplevel(0)
-            home_gk_df = tables[9].columns.droplevel(0)
-            away_p_df = tables[10].columns.droplevel(0)
-            away_gk_df = tables[16].columns.droplevel(0)
+            home_p_df = tables[3]
+            home_p_df.columns = home_p_df.columns.droplevel(0)
+            home_gk_df = tables[9]
+            home_gk_df.columns = home_gk_df.columns.droplevel(0)
+            away_p_df = tables[10]
+            away_p_df.columns = away_p_df.columns.droplevel(0)
+            away_gk_df = tables[16]
+            away_gk_df.columns = away_gk_df.columns.droplevel(0)
 
-            # store data
-            file.put("Player Info/Home Players", home_p_df)
-            file.put("Player Info/Home Goal Keeper", home_gk_df_)
-            file.put("Player Info/Away Players", away_p_df)
-            file.put("Player Info/Away Goal Keeper", away_gk_df)
+            # store in json
+            data_dict = {
+                "Home Team": {
+                    "Player Data": home_p_df.to_dict(orient="records"),
+                    "Goalkeeper Data": home_gk_df.to_dict(orient="records"),
+                },
+                "Away Team": {
+                    "Player Data": away_p_df.to_dict(orient="records"),
+                    "Goalkeeper Data": away_gk_df.to_dict(orient="records"),
+                },
+            }
+            json.dump(data_dict, json_file, indent=4)
 
-            break
+        # TODO: game data
 
-            # TODO: game data
-            pattern = r"/en/matches/([a-f0-9]+)/(.*?)-(.*?)-(\w+\s\d{1,2}-\d{4})"
-            match = re.search(pattern, match_link)
+        # pattern = r"/en/matches/([a-f0-9]+)/(.*?)-(.*?)-(\w+\s\d{1,2}-\d{4})"
+        # match = re.search(pattern, match_link)
 
-            if match:
-                match_id = match.group(1)
-                home_team = match.group(2)
-                away_team = match.group(3)
-                date = match.group(4)
+        # if match:
+        #     match_id = match.group(1)
+        #     home_team = match.group(2)
+        #     away_team = match.group(3)
+        #     date = match.group(4)
 
-            game_df = pd.DataFrame(
-                {"Home team": home_team, "Away team": away_team, "Date": date}
-            )
-            print(game_df)
-        sys.exit()
+        # game_df = pd.DataFrame(
+        #     {"Home team": home_team, "Away team": away_team, "Date": date}
+        # )
     return
 
 
