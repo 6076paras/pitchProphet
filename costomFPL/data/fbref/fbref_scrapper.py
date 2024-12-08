@@ -49,7 +49,7 @@ def soup_URL(url, season, league):
 
 
 def get_data(match_links, league, season):
-    with open(f"costomFPL/data/FBRef-{league}-{season}.json", "w") as json_file:
+    with open(f"costomFPL/data/fbref/{league}-{season}.json", "w") as json_file:
         for match_link in match_links:
             tables = pd.read_html(match_link)
 
