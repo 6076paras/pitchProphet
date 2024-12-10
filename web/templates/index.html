@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedictions</title>
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Additional CSS Files -->
+    <link rel="stylesheet" href="assets/css/fontawesome.css" />
+    <link rel="stylesheet" href="assets/css/tooplate-style.css" />
+    <link rel="stylesheet" href="assets/css/owl.css" />
+    <link rel="stylesheet" href="assets/css/lightbox.css" />
+</head>
+<body>
+
+<h1>Match Week Predictions</h1>
+
+
+<div id="predictionTable">
+    {{ table | safe }}
+</div>
+
+<!-- Button to trigger data refresh -->
+<button onclick="updateTable()">Refresh Table</button>
+
+<script>
+</script>
+
+</body>
+</html>

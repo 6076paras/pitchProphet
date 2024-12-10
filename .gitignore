@@ -6,3 +6,4 @@
 *.pyc
 *.csv
 .DS_Store
+web/node_modules/*
