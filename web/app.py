@@ -1,4 +1,5 @@
 import pandas as pd
+import test_prediction
 from flask import Flask, render_template
 
 app = Flask(__name__)
@@ -11,11 +12,7 @@ def fetch_fixture():
 
 @app.route("/")
 def mk_table():
-    data = {
-        "Name": ["Alice", "Bob", "Charlie"],
-        "Age": [25, 30, 35],
-        "City": ["New York", "Los Angeles", "Chicago"],
-    }
+    data = test_prediction.generate_ml_out()
     df = pd.DataFrame(data)
     html_table = df.to_html(classes="table table-striped")
 

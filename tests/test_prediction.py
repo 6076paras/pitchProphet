@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 
-def generate_match_data():
+def generate_ml_out():
     home_team_names = [
         "Manchester United",
         "Liverpool",
@@ -40,11 +40,11 @@ def generate_match_data():
 
     df = pd.DataFrame(
         {
-            "Home Team Name": home_team_names,
-            "Away Team Name": away_team_names,
-            "Home Team Win Probability": home_win_prob,
-            "Away Team Win Probability": away_win_prob,
-            "Draw Probability": draw_prob,
+            "Home Team": home_team_names,
+            "Away Team": away_team_names,
+            "p(Home Team)": home_win_prob,
+            "p(Away Team)": away_win_prob,
+            "p(Draw)": draw_prob,
         }
     )
 
