@@ -52,8 +52,10 @@ def soup_URL(url, season, league):
 def get_data(match_links, league, season):
 
     total_match = len(match_links)
+    i = 0
+    file_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
     with open(
-        f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}.json",
+        file_name,
         "w",
     ) as json_file:
 
@@ -116,9 +118,18 @@ def get_data(match_links, league, season):
                     },
                 }
                 json.dump(data_dict, json_file, indent=4)
-                time.sleep(random.uniform(3, 5))
+                time.sleep(random.uniform(5, 10))
+
+                # make file name unique
+                current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
+                new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
+                os.rename(current_name, new_name)
+                if i == 3:
+                    break
+
         except Exception as e:
             print(f"Error extracting table data for {match_link} : {e}")
+
     return
 
 
