@@ -77,14 +77,26 @@ def get_data(match_links, league, season):
             match_week = re.sub(r"\D", "", match_week)
 
             # xg from class="score_xg"
+            xG = parse_html.find_all(class_="score_xg")
+            home_xG = xG[0].text
+            away_xG = xG[1].text
 
             # goals from class="score"
-
+            goals = parse_html.find_all(class_="score")
+            home_goals = goals[0].text
+            away_goals = goals[1].text
             # team names from class="scorebox".strong.anchor
+            print(home_goals, home_xG)
 
             # store in json
             data_dict = {
-                "Game Data": {"Matchweek": int(match_week)},
+                "Game Data": {
+                    "Matchweek": int(match_week),
+                    "HomeGoal": int(home_goals),
+                    "AwayGoal": int(away_goals),
+                    "HomeXG": float(home_xG),
+                    "AwayXG": float(away_xG),
+                },
                 "Player Data": {
                     "Home Team": home_p_df.to_dict(orient="records"),
                     "Home Team GK ": home_gk_df.to_dict(orient="records"),
