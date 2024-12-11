@@ -1,6 +1,8 @@
 import json
+import os
 import re
 import sys
+import time
 
 import h5py
 import pandas as pd
@@ -49,7 +51,11 @@ def soup_URL(url, season, league):
 
 
 def get_data(match_links, league, season):
-    with open(f"costomFPL/data/fbref/{league}-{season}.json", "w") as json_file:
+    print(os.path.abspath(__file__))
+    with open(
+        f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}.json",
+        "w",
+    ) as json_file:
         for match_link in match_links:
             tables = pd.read_html(match_link)
 
@@ -84,8 +90,21 @@ def get_data(match_links, league, season):
             }
             json.dump(data_dict, json_file, indent=4)
             time.sleep(3)
+            sys.exit()
 
     return
+
+
+def get_fixtures(match_week, league=None):
+    """
+    Returns a fixture list from FBRef
+    """
+    url = "https://fbref.com/en/comps/9/2023-2024/schedule/2023-2024-Premier-League-Scores-and-Fixtures"
+    all_fixtures = pd.read_html(url)
+    week_fixtures = all_fixtures[0][all_fixtures[0]["Wk"] == match_week]
+    team_list = week_fixtures[["Home", "Away"]].reset_index()
+    team_list.name = f"Matchweek {match_week}"
+    return team_list
 
 
 def main():
@@ -97,7 +116,8 @@ def main():
         "Premier-League",
         "2023-2024",
     )
-    get_data(soup_URL(url, season, league), season, league)
+    # get_data(soup_URL(url, season, league), season, league)
+    print(get_fixtures(16), url)
     return
 
 
