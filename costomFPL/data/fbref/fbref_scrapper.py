@@ -76,7 +76,11 @@ def get_data(match_links, league, season):
             match_week = parse_html.find(string=re.compile(r"Matchweek \d+"))
             match_week = re.sub(r"\D", "", match_week)
 
-            # TODO: score, home_team and away team info
+            # xg from class="score_xg"
+
+            # goals from class="score"
+
+            # team names from class="scorebox".strong.anchor
 
             # store in json
             data_dict = {
@@ -116,8 +120,7 @@ def main():
         "Premier-League",
         "2023-2024",
     )
-    # get_data(soup_URL(url, season, league), season, league)
-    print(get_fixtures(16), url)
+    get_data(soup_URL(url, season, league), season, league)
     return
 
 
