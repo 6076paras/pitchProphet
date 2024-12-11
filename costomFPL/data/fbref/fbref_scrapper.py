@@ -117,7 +117,7 @@ def get_data(match_links, league, season):
                 json.dump(data_dict, json_file, indent=4)
                 time.sleep(3)
         except Exception as e:
-            print("Error extracting table data for {match_link}: {e}")
+            print(f"Error extracting table data for {match_link} : {e}")
     return
 
 
