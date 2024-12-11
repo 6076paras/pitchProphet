@@ -85,23 +85,30 @@ def get_data(match_links, league, season):
             goals = parse_html.find_all(class_="score")
             home_goals = goals[0].text
             away_goals = goals[1].text
-            # team names from class="scorebox".strong.anchor
-            print(home_goals, home_xG)
 
+            # team names from class="scorebox" strong anchor
+            teams = parse_html.select(".scorebox strong a")
+
+            duplicate_columns = home_p_df.columns[
+                home_p_df.columns.duplicated()
+            ].tolist()
+            print(duplicate_columns)
             # store in json
             data_dict = {
-                "Game Data": {
+                "GameData": {
                     "Matchweek": int(match_week),
+                    "HomeTeam": teams[0].text,
+                    "AwayTeam": teams[1].text,
                     "HomeGoal": int(home_goals),
                     "AwayGoal": int(away_goals),
                     "HomeXG": float(home_xG),
                     "AwayXG": float(away_xG),
                 },
-                "Player Data": {
-                    "Home Team": home_p_df.to_dict(orient="records"),
-                    "Home Team GK ": home_gk_df.to_dict(orient="records"),
-                    "Away Team": away_p_df.to_dict(orient="records"),
-                    "Away Team GK": away_gk_df.to_dict(orient="records"),
+                "PlayerData": {
+                    "HomeTeam": home_p_df.to_dict(orient="records"),
+                    "HomeTeamGK": home_gk_df.to_dict(orient="records"),
+                    "AwayTeam": away_p_df.to_dict(orient="records"),
+                    "AwayTeamGK": away_gk_df.to_dict(orient="records"),
                 },
             }
             json.dump(data_dict, json_file, indent=4)
