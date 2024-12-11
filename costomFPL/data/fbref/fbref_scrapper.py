@@ -1,7 +1,5 @@
 import json
-import os
 import re
-import sys
 import time
 
 import h5py
@@ -118,8 +116,6 @@ def get_data(match_links, league, season):
                 }
                 json.dump(data_dict, json_file, indent=4)
                 time.sleep(3)
-                if i == 3:
-                    break
         except Exception as e:
             print("Error extracting table data for {match_link}: {e}")
     return
