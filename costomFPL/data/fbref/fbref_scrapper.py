@@ -51,14 +51,16 @@ def soup_URL(url, season, league):
 
 
 def get_data(match_links, league, season):
-    print(os.path.abspath(__file__))
+
+    total_match = len(match_links)
     with open(
         f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}.json",
         "w",
     ) as json_file:
-        for match_link in match_links:
-            tables = pd.read_html(match_link)
 
+        for i, match_link in enumerate(match_links, start=1):
+            print(f"Processing match {i}/{total_match}")
+            tables = pd.read_html(match_link)
             # player data
             home_p_df = tables[3]
             home_p_df.columns = home_p_df.columns.droplevel(0)
@@ -115,7 +117,8 @@ def get_data(match_links, league, season):
             }
             json.dump(data_dict, json_file, indent=4)
             time.sleep(3)
-            sys.exit()
+            if i == 3:
+                break
 
     return
 
