@@ -1,4 +1,5 @@
 import json
+import random
 import re
 import time
 
@@ -115,7 +116,7 @@ def get_data(match_links, league, season):
                     },
                 }
                 json.dump(data_dict, json_file, indent=4)
-                time.sleep(3)
+                time.sleep(random.uniform(3, 5))
         except Exception as e:
             print(f"Error extracting table data for {match_link} : {e}")
     return
