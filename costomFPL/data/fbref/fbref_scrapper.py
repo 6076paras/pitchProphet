@@ -58,68 +58,70 @@ def get_data(match_links, league, season):
         "w",
     ) as json_file:
 
-        for i, match_link in enumerate(match_links, start=1):
-            print(f"Processing match {i}/{total_match}")
-            tables = pd.read_html(match_link)
-            # player data
-            home_p_df = tables[3]
-            home_p_df.columns = home_p_df.columns.droplevel(0)
-            home_p_df = home_p_df.loc[:, ~home_p_df.columns.duplicated()]
+        try:
+            for i, match_link in enumerate(match_links, start=1):
+                print(f"Processing match {i}/{total_match}")
+                tables = pd.read_html(match_link)
+                # player data
+                home_p_df = tables[3]
+                home_p_df.columns = home_p_df.columns.droplevel(0)
+                home_p_df = home_p_df.loc[:, ~home_p_df.columns.duplicated()]
 
-            home_gk_df = tables[9]
-            home_gk_df.columns = home_gk_df.columns.droplevel(0)
-            home_gk_df = home_gk_df.loc[:, ~home_gk_df.columns.duplicated()]
+                home_gk_df = tables[9]
+                home_gk_df.columns = home_gk_df.columns.droplevel(0)
+                home_gk_df = home_gk_df.loc[:, ~home_gk_df.columns.duplicated()]
 
-            away_p_df = tables[10]
-            away_p_df.columns = away_p_df.columns.droplevel(0)
-            away_p_df = away_p_df.loc[:, ~away_p_df.columns.duplicated()]
+                away_p_df = tables[10]
+                away_p_df.columns = away_p_df.columns.droplevel(0)
+                away_p_df = away_p_df.loc[:, ~away_p_df.columns.duplicated()]
 
-            away_gk_df = tables[16]
-            away_gk_df.columns = away_gk_df.columns.droplevel(0)
-            away_gk_df = away_gk_df.loc[:, ~away_gk_df.columns.duplicated()]
+                away_gk_df = tables[16]
+                away_gk_df.columns = away_gk_df.columns.droplevel(0)
+                away_gk_df = away_gk_df.loc[:, ~away_gk_df.columns.duplicated()]
 
-            # extract game data
-            req_obj = requests.get(match_link)
-            parse_html = BeautifulSoup(req_obj.content, "html.parser")
+                # extract game data
+                req_obj = requests.get(match_link)
+                parse_html = BeautifulSoup(req_obj.content, "html.parser")
 
-            match_week = parse_html.find(string=re.compile(r"Matchweek \d+"))
-            match_week = re.sub(r"\D", "", match_week)
+                match_week = parse_html.find(string=re.compile(r"Matchweek \d+"))
+                match_week = re.sub(r"\D", "", match_week)
 
-            # xg from class="score_xg"
-            xG = parse_html.find_all(class_="score_xg")
-            home_xG = xG[0].text
-            away_xG = xG[1].text
+                # xg from class="score_xg"
+                xG = parse_html.find_all(class_="score_xg")
+                home_xG = xG[0].text
+                away_xG = xG[1].text
 
-            # goals from class="score"
-            goals = parse_html.find_all(class_="score")
-            home_goals = goals[0].text
-            away_goals = goals[1].text
+                # goals from class="score"
+                goals = parse_html.find_all(class_="score")
+                home_goals = goals[0].text
+                away_goals = goals[1].text
 
-            # team names from class="scorebox" strong anchor
-            teams = parse_html.select(".scorebox strong a")
+                # team names from class="scorebox" strong anchor
+                teams = parse_html.select(".scorebox strong a")
 
-            data_dict = {
-                "GameData": {
-                    "Matchweek": int(match_week),
-                    "HomeTeam": teams[0].text,
-                    "AwayTeam": teams[1].text,
-                    "HomeGoal": int(home_goals),
-                    "AwayGoal": int(away_goals),
-                    "HomeXG": float(home_xG),
-                    "AwayXG": float(away_xG),
-                },
-                "PlayerData": {
-                    "HomeTeam": home_p_df.to_dict(orient="records"),
-                    "HomeTeamGK": home_gk_df.to_dict(orient="records"),
-                    "AwayTeam": away_p_df.to_dict(orient="records"),
-                    "AwayTeamGK": away_gk_df.to_dict(orient="records"),
-                },
-            }
-            json.dump(data_dict, json_file, indent=4)
-            time.sleep(3)
-            if i == 3:
-                break
-
+                data_dict = {
+                    "GameData": {
+                        "Matchweek": int(match_week),
+                        "HomeTeam": teams[0].text,
+                        "AwayTeam": teams[1].text,
+                        "HomeGoal": int(home_goals),
+                        "AwayGoal": int(away_goals),
+                        "HomeXG": float(home_xG),
+                        "AwayXG": float(away_xG),
+                    },
+                    "PlayerData": {
+                        "HomeTeam": home_p_df.to_dict(orient="records"),
+                        "HomeTeamGK": home_gk_df.to_dict(orient="records"),
+                        "AwayTeam": away_p_df.to_dict(orient="records"),
+                        "AwayTeamGK": away_gk_df.to_dict(orient="records"),
+                    },
+                }
+                json.dump(data_dict, json_file, indent=4)
+                time.sleep(3)
+                if i == 3:
+                    break
+        except Exception as e:
+            print("Error extracting table data for {match_link}: {e}")
     return
 
 
