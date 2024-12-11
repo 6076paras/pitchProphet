@@ -62,12 +62,19 @@ def get_data(match_links, league, season):
             # player data
             home_p_df = tables[3]
             home_p_df.columns = home_p_df.columns.droplevel(0)
+            home_p_df = home_p_df.loc[:, ~home_p_df.columns.duplicated()]
+
             home_gk_df = tables[9]
             home_gk_df.columns = home_gk_df.columns.droplevel(0)
+            home_gk_df = home_gk_df.loc[:, ~home_gk_df.columns.duplicated()]
+
             away_p_df = tables[10]
             away_p_df.columns = away_p_df.columns.droplevel(0)
+            away_p_df = away_p_df.loc[:, ~away_p_df.columns.duplicated()]
+
             away_gk_df = tables[16]
             away_gk_df.columns = away_gk_df.columns.droplevel(0)
+            away_gk_df = away_gk_df.loc[:, ~away_gk_df.columns.duplicated()]
 
             # extract game data
             req_obj = requests.get(match_link)
@@ -89,11 +96,6 @@ def get_data(match_links, league, season):
             # team names from class="scorebox" strong anchor
             teams = parse_html.select(".scorebox strong a")
 
-            duplicate_columns = home_p_df.columns[
-                home_p_df.columns.duplicated()
-            ].tolist()
-            print(duplicate_columns)
-            # store in json
             data_dict = {
                 "GameData": {
                     "Matchweek": int(match_week),
