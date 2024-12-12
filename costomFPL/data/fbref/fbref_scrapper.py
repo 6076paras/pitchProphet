@@ -125,8 +125,6 @@ def get_data(match_links, league, season):
                 current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
                 new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
                 os.rename(current_name, new_name)
-                if i == 5:
-                    break
 
         except Exception as e:
             print(f"Error extracting table data for {match_link} : {e}")
@@ -144,6 +142,11 @@ def get_fixtures(match_week, league=None):
     team_list = week_fixtures[["Home", "Away"]].reset_index()
     team_list.name = f"Matchweek {match_week}"
     return team_list
+
+
+# TODO: only keep json with largest match data
+def del_json():
+    pass
 
 
 def main():
