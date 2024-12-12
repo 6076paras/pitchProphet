@@ -2,6 +2,7 @@ import json
 import os
 import random
 import re
+import sys
 import time
 
 import h5py
@@ -50,20 +51,21 @@ def soup_URL(url, season, league):
     return match_links
 
 
-def get_data(match_links, league, season):
+def get_data(match_links, league, season, player_data=False):
 
     total_match = len(match_links)
     i = 0
-    file_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
-    with open(
+    file_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.h5"
+    with h5py.File(
         file_name,
         "w",
-    ) as json_file:
+    ) as h5_file:
 
         try:
             for i, match_link in enumerate(match_links, start=1):
                 print(f"Processing match {i}/{total_match}")
                 tables = pd.read_html(match_link)
+
                 # player data
                 home_p_df = tables[3]
                 home_p_df.columns = home_p_df.columns.droplevel(0)
@@ -101,6 +103,12 @@ def get_data(match_links, league, season):
                 # team names from class="scorebox" strong anchor
                 teams = parse_html.select(".scorebox strong a")
 
+                # convert team stats to sturctured numpy array
+                team_h_p = home_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
+                team_a_p = away_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
+
+                # convert general match info into np stuructued array
+
                 data_dict = {
                     "GameData": {
                         "Matchweek": int(match_week),
@@ -110,6 +118,7 @@ def get_data(match_links, league, season):
                         "AwayGoal": int(away_goals),
                         "HomeXG": float(home_xG),
                         "AwayXG": float(away_xG),
+                        "HomeTStat": home_p_df.iloc([-1], [3, -1]),
                     },
                     "PlayerData": {
                         "HomeTeam": home_p_df.to_dict(orient="records"),
@@ -118,14 +127,16 @@ def get_data(match_links, league, season):
                         "AwayTeamGK": away_gk_df.to_dict(orient="records"),
                     },
                 }
-                json.dump(data_dict, json_file, indent=4)
-                time.sleep(random.uniform(5, 10))
+
+                # json.dump(data_dict, json_file, indent=4)
+                # time.sleep(random.uniform(5, 10))
 
                 # make file name unique
-                current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
-                new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
-                os.rename(current_name, new_name)
+                # current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
+                # new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
+                # os.rename(current_name, new_name)
 
+            sys.ext()
         except Exception as e:
             print(f"Error extracting table data for {match_link} : {e}")
 

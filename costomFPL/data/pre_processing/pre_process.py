@@ -1,11 +1,12 @@
 import pandas as pd
+import yaml
 
 
-def load_data(files, config):
+def load_data(path: str) -> pd.DataFrame:
     """
-    Loads .csv files and returns df object with relevent variables
+    Loads json file into pd.Dataframe
     """
-    pass
+    return pd.read_csv(path)
 
 
 def calc_stats(n, data):
@@ -22,12 +23,16 @@ def calc_stats(n, data):
     pass
 
 
+def extract_relv(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Extract relevent data
+    """
+    pass
+
+
 def main():
-    print("Test")
-    path = "/Users/paraspokharel/Programming/costomFPL/costomFPL/config/dataVars.yaml"
-    with open(path, "r") as file:
-        config = yaml.safe_load(file)
-    return
+    json_path = "/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/2023-2024-Premier-League-76-matches.json"
+    print(pd.json_normalize(json_path))
 
 
 if __name__ == "__main__":
