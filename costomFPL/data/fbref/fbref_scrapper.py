@@ -83,7 +83,8 @@ def get_data(match_links, league, season, player_data=False):
                 away_gk_df.columns = away_gk_df.columns.droplevel(0)
                 away_gk_df = away_gk_df.loc[:, ~away_gk_df.columns.duplicated()]
 
-                # extract game data
+                # Extract Game Data
+
                 req_obj = requests.get(match_link)
                 parse_html = BeautifulSoup(req_obj.content, "html.parser")
 
@@ -103,30 +104,29 @@ def get_data(match_links, league, season, player_data=False):
                 # team names from class="scorebox" strong anchor
                 teams = parse_html.select(".scorebox strong a")
 
-                # convert team stats to sturctured numpy array
-                team_h_p = home_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
-                team_a_p = away_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
+                # Convert To Numpy Struct Array
 
-                # convert general match info into np stuructued array
+                # toal team stats
+                team_h_p = home_p_df.iloc[-1, 5:].to_frame().T.to_records()
+                team_a_p = away_p_df.iloc[-1, 5:].to_frame().T.to_records()
 
-                data_dict = {
-                    "GameData": {
-                        "Matchweek": int(match_week),
-                        "HomeTeam": teams[0].text,
-                        "AwayTeam": teams[1].text,
-                        "HomeGoal": int(home_goals),
-                        "AwayGoal": int(away_goals),
-                        "HomeXG": float(home_xG),
-                        "AwayXG": float(away_xG),
-                        "HomeTStat": home_p_df.iloc([-1], [3, -1]),
-                    },
-                    "PlayerData": {
-                        "HomeTeam": home_p_df.to_dict(orient="records"),
-                        "HomeTeamGK": home_gk_df.to_dict(orient="records"),
-                        "AwayTeam": away_p_df.to_dict(orient="records"),
-                        "AwayTeamGK": away_gk_df.to_dict(orient="records"),
-                    },
+                # team general data
+                g_data = {
+                    "Matchweek": int(match_week),
+                    "HomeTeam": teams[0].text,
+                    "AwayTeam": teams[1].text,
+                    "HomeGoal": int(home_goals),
+                    "AwayGoal": int(away_goals),
+                    "HomeXG": float(home_xG),
+                    "AwayXG": float(away_xG),
                 }
+                game_data = pd.DataFrame(g_data).to_records(index=True)
+
+                # player data
+                team_h_p = home_p_df.iloc[:-1].to_frame().T.to_records()
+                team_a_p = away_p_df.iloc[:-1].to_frame().T.to_records()
+                home_gk = home_gk_df.to_frame().T.to_records()
+                away_gk_df = away_gk_df.to_frame().T.to_records()
 
                 # json.dump(data_dict, json_file, indent=4)
                 # time.sleep(random.uniform(5, 10))
