@@ -130,7 +130,7 @@ def get_data(match_links, league, season, player_data=False):
                     "HomeXG": float(home_xG),
                     "AwayXG": float(away_xG),
                 }
-                game_data = pd.DataFrame(g_data).to_records(index=True)
+                game_data = pd.DataFrame([g_data]).to_records(index=True)
 
                 # player data
                 if player_data == True:
