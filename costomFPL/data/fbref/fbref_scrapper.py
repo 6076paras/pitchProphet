@@ -123,14 +123,30 @@ def get_data(match_links, league, season, player_data=False):
                 # team general data
                 g_data = {
                     "Matchweek": int(match_week),
-                    "HomeTeam": teams[0].text,
-                    "AwayTeam": teams[1].text,
+                    "HomeTeam": str(teams[0].text),
+                    "AwayTeam": str(teams[1].text),
                     "HomeGoal": int(home_goals),
                     "AwayGoal": int(away_goals),
                     "HomeXG": float(home_xG),
                     "AwayXG": float(away_xG),
                 }
                 game_data = pd.DataFrame([g_data]).to_records(index=True)
+
+                # TODO: Clean later!
+                # datatype for h5 handeling
+                new_type = np.dtype(
+                    [
+                        ("index", "<i8"),
+                        ("Matchweek", "<i8"),
+                        ("HomeTeam", "<S10"),
+                        ("AwayTeam", "<S10"),
+                        ("HomeGoal", "<i8"),
+                        ("AwayGoal", "<i8"),
+                        ("HomeXG", "<f8"),
+                        ("AwayXG", "<f8"),
+                    ]
+                )
+                game_data = game_data.astype(new_type)
 
                 # player data
                 if player_data == True:
@@ -143,9 +159,8 @@ def get_data(match_links, league, season, player_data=False):
 
                 # global stat
                 m_g_list.append(game_data)
-                print("List is:", m_g_list)
                 m_a_list.append(team_a_p)
-                m_h_list = m_h_list.append(team_h_p)
+                m_h_list.append(team_h_p)
 
                 # player stat
                 if player_data == True:
@@ -154,9 +169,14 @@ def get_data(match_links, league, season, player_data=False):
                     gk_a_l.append(home_gk)
                     gk_h_l.append(away_gk)
 
+                # make file name unique
+                current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.h5"
+                new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.h5"
+                os.rename(current_name, new_name)
+
                 time.sleep(random.uniform(5, 10))
 
-                if i == 3:
+                if i == 1:
                     break
 
         except Exception as e:
@@ -166,6 +186,11 @@ def get_data(match_links, league, season, player_data=False):
 
         # convert to numpy
         game_a = np.concatenate(m_g_list)
+        print(
+            f"""frist element:{game_a[0]}
+        Array: {game_a}
+        Datatype: {game_a[0].dtype}"""
+        )
         game_h_p_a = np.concatenate(m_h_list)
         game_a_p_a = np.concatenate(m_a_list)
         if player_data == True:
@@ -174,9 +199,10 @@ def get_data(match_links, league, season, player_data=False):
             gk_a_a = np.concatenate(gk_a_l)
             gk_h_a = np.concatenate(gk_h_l)
 
+        # TODO: create subgroup instead??
         # write
-        team = h5py.create_group("team_data")
-        player = h5py.create_group("player_data")
+        team = h5_file.create_group("team_data")
+        player = h5_file.create_group("player_data")
 
         team.create_dataset("game_info", data=game_a)
         team.create_dataset("home_team", data=game_h_p_a)
