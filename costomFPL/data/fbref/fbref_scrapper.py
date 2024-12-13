@@ -117,8 +117,8 @@ def get_data(match_links, league, season, player_data=False):
                 # Convert To Numpy Struct Array
 
                 # toal team stats
-                team_h_p = home_p_df.iloc[-1, 5:].to_frame().T.to_records()
-                team_a_p = away_p_df.iloc[-1, 5:].to_frame().T.to_records()
+                team_h_p = home_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
+                team_a_p = away_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
 
                 # team general data
                 g_data = {
@@ -134,24 +134,25 @@ def get_data(match_links, league, season, player_data=False):
 
                 # player data
                 if player_data == True:
-                    h_p = home_p_df.iloc[:-1].to_frame().T.to_records()
-                    a_p = away_p_df.iloc[:-1].to_frame().T.to_records()
-                    home_gk = home_gk_df.to_frame().T.to_records()
-                    away_gk = away_gk_df.to_frame().T.to_records()
+                    h_p = home_p_df.iloc[:-1].to_frame().T.to_records(index=True)
+                    a_p = away_p_df.iloc[:-1].to_frame().T.to_records(index=True)
+                    home_gk = home_gk_df.to_frame().T.to_records(index=True)
+                    away_gk = away_gk_df.to_frame().T.to_records(index=True)
 
                 # Make List for H5 Dataset
 
                 # global stat
-                m_g_list = m_g_list.append(game_data)
-                m_a_list = m_a_list.appendteam_a_p()
+                m_g_list.append(game_data)
+                print("List is:", m_g_list)
+                m_a_list.append(team_a_p)
                 m_h_list = m_h_list.append(team_h_p)
 
                 # player stat
                 if player_data == True:
-                    p_a_l = p_a_l.append(a_p)
-                    p_h_l = _h_l.append(h_p)
-                    gk_a_l = gk_a_l.append(home_gk)
-                    gk_h_l = gk_h_l.append(away_gk)
+                    p_a_l.append(a_p)
+                    p_h_l.append(h_p)
+                    gk_a_l.append(home_gk)
+                    gk_h_l.append(away_gk)
 
                 time.sleep(random.uniform(5, 10))
 
