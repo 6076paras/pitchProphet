@@ -6,6 +6,7 @@ import sys
 import time
 
 import h5py
+import numpy as np
 import pandas as pd
 import requests
 import yaml
@@ -55,6 +56,15 @@ def get_data(match_links, league, season, player_data=False):
 
     total_match = len(match_links)
     i = 0
+    # Initialize list for h5file's subgroup -> 3 groups for global game stat, 4 group for local player stat
+    m_g_list = []
+    m_a_list = []
+    m_h_list = []
+    p_a_l = []
+    p_h_l = []
+    gk_a_l = []
+    gk_h_l = []
+
     file_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.h5"
     with h5py.File(
         file_name,
@@ -66,7 +76,7 @@ def get_data(match_links, league, season, player_data=False):
                 print(f"Processing match {i}/{total_match}")
                 tables = pd.read_html(match_link)
 
-                # player data
+                # avaliable table data from the html page
                 home_p_df = tables[3]
                 home_p_df.columns = home_p_df.columns.droplevel(0)
                 home_p_df = home_p_df.loc[:, ~home_p_df.columns.duplicated()]
@@ -123,22 +133,59 @@ def get_data(match_links, league, season, player_data=False):
                 game_data = pd.DataFrame(g_data).to_records(index=True)
 
                 # player data
-                team_h_p = home_p_df.iloc[:-1].to_frame().T.to_records()
-                team_a_p = away_p_df.iloc[:-1].to_frame().T.to_records()
-                home_gk = home_gk_df.to_frame().T.to_records()
-                away_gk_df = away_gk_df.to_frame().T.to_records()
+                if player_data == True:
+                    h_p = home_p_df.iloc[:-1].to_frame().T.to_records()
+                    a_p = away_p_df.iloc[:-1].to_frame().T.to_records()
+                    home_gk = home_gk_df.to_frame().T.to_records()
+                    away_gk = away_gk_df.to_frame().T.to_records()
 
-                # json.dump(data_dict, json_file, indent=4)
-                # time.sleep(random.uniform(5, 10))
+                # Make List for H5 Dataset
 
-                # make file name unique
-                # current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
-                # new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
-                # os.rename(current_name, new_name)
+                # global stat
+                m_g_list = m_g_list.append(game_data)
+                m_a_list = m_a_list.appendteam_a_p()
+                m_h_list = m_h_list.append(team_h_p)
 
-            sys.ext()
+                # player stat
+                if player_data == True:
+                    p_a_l = p_a_l.append(a_p)
+                    p_h_l = _h_l.append(h_p)
+                    gk_a_l = gk_a_l.append(home_gk)
+                    gk_h_l = gk_h_l.append(away_gk)
+
+                time.sleep(random.uniform(5, 10))
+
+                if i == 3:
+                    break
+
         except Exception as e:
             print(f"Error extracting table data for {match_link} : {e}")
+
+        # Write to H5 File
+
+        # convert to numpy
+        game_a = np.concatenate(m_g_list)
+        game_h_p_a = np.concatenate(m_h_list)
+        game_a_p_a = np.concatenate(m_a_list)
+        if player_data == True:
+            p_a_a = np.concatenate(p_a_l)
+            p_h_a = np.concatenate(p_h_l)
+            gk_a_a = np.concatenate(gk_a_l)
+            gk_h_a = np.concatenate(gk_h_l)
+
+        # write
+        team = h5py.create_group("team_data")
+        player = h5py.create_group("player_data")
+
+        team.create_dataset("game_info", data=game_a)
+        team.create_dataset("home_team", data=game_h_p_a)
+        team.create_dataset("away_team", data=game_a_p_a)
+
+        if player_data == True:
+            player.create_dataset("home_players", data=p_h_a)
+            player.create_dataset("away_players", data=p_h_a)
+            player.create_dataset("home_gk", data=gk_h_a)
+            player.create_dataset("away_gk", data=gk_a_a)
 
     return
 
