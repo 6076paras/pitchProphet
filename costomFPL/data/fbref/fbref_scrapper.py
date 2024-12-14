@@ -52,24 +52,82 @@ def soup_URL(url, season, league):
     return match_links
 
 
+def fix_dtype(data: Dict[str, Dict[str, np.recarray]]):
+    """
+    Find h5py unsupported type and re-assign data type for required fields
+    """
+    pass
+
+
+def convert_struct(
+    data: Dict[str, Dict[str, pd.DataFrame]]
+) -> Dict[str, Dict[str, np.recarray]]:
+    """
+    Converts pd.Dataframe -> np.records for h5py handeling
+    """
+    data = {
+        outer_key: {
+            inner_key: df.to_records(index=True) for inner_key, df in outer_dict.items()
+        }
+        for outer_key, outer_dict in data_dict.items()
+    }
+
+    return data
+
+
+def convert_to_list(
+    data: Dict[str, Dict[str, np.recarray]]
+) -> Dict[str, Dict[str, list[np.recarray]]]:
+    """
+    convert np.recarry item to list [np.recarry]
+    """
+    data = {
+        outer_key: {
+            inner_key: [struct_data] for inner_key, struct_data in outer_dict.items()
+        }
+        for outer_key, outer_dict in data_dict.items()
+    }
+    return data
+
+
+def init_lists(data: Dict[str, Dict[str, pd.DataFrame]]) -> Dict[str, Dict[str, list]]:
+    """
+    Initialize empty list that will later be converted to h5py dataset with np
+    """
+    empty_list = {
+        outer_key: {inner_key: [] for inner_key, struct_data in outer_dict.items()}
+        for outer_key, outer_dict in data_dict.items()
+    }
+    return empty_list
+
+
+def append_np_rec(struct_data: dict, struct_lists: dict) -> Dict:
+    """
+    Append the np.recarray object into lists within a nested dictionary structure
+    """
+    for outer_key, outer_dict in struct_data.items():
+        for inner_key, rec_data in outer_dict.items():
+            struct_lists[outer_key][inner_key].append(rec_data)
+    return struct_lists
+
+
+# TOD0
+def h5_store(data):
+    """
+    Store {group:{subgroup:Dataset}} -> h5
+    """
+
+
 def get_data(match_links, league, season, player_data=False):
 
-    total_match = len(match_links)
     i = 0
-    # Initialize list for h5file's subgroup -> 3 groups for global game stat, 4 group for local player stat
-    m_g_list = []
-    m_a_list = []
-    m_h_list = []
-    p_a_l = []
-    p_h_l = []
-    gk_a_l = []
-    gk_h_l = []
+    total_match = len(match_links)
 
-    file_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.h5"
-    with h5py.File(
+    file_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
+    with open(
         file_name,
         "w",
-    ) as h5_file:
+    ) as json_file:
 
         try:
             for i, match_link in enumerate(match_links, start=1):
@@ -93,7 +151,7 @@ def get_data(match_links, league, season, player_data=False):
                 away_gk_df.columns = away_gk_df.columns.droplevel(0)
                 away_gk_df = away_gk_df.loc[:, ~away_gk_df.columns.duplicated()]
 
-                # Extract Game Data
+                # Scrapp Game Data
 
                 req_obj = requests.get(match_link)
                 parse_html = BeautifulSoup(req_obj.content, "html.parser")
@@ -114,18 +172,8 @@ def get_data(match_links, league, season, player_data=False):
                 # team names from class="scorebox" strong anchor
                 teams = parse_html.select(".scorebox strong a")
 
-                # Convert To Numpy Struct Array
-
-                # toal team stats
-                team_h_p = home_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
-                team_a_p = away_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
-
-                # convert to float for h5py handeling
-                team_h_p = team_h_p.astype("float")
-                team_a_p = team_a_p.astype("float")
-
-                # team general data
-                g_data = {
+                # match info
+                match_info = {
                     "Matchweek": int(match_week),
                     "HomeTeam": str(teams[0].text),
                     "AwayTeam": str(teams[1].text),
@@ -134,49 +182,52 @@ def get_data(match_links, league, season, player_data=False):
                     "HomeXG": float(home_xG),
                     "AwayXG": float(away_xG),
                 }
-                game_data = pd.DataFrame([g_data]).to_records(index=True)
+                # toal team stats
+                team_h_p = home_p_df.iloc[-1, 5:].to_frame()
+                team_a_p = away_p_df.iloc[-1, 5:].to_frame()
 
-                # TODO: Clean later!
-                # datatype for h5 handeling
-                new_type = np.dtype(
-                    [
-                        ("index", "<i8"),
-                        ("Matchweek", "<i8"),
-                        ("HomeTeam", "<S10"),
-                        ("AwayTeam", "<S10"),
-                        ("HomeGoal", "<i8"),
-                        ("AwayGoal", "<i8"),
-                        ("HomeXG", "<f8"),
-                        ("AwayXG", "<f8"),
-                    ]
-                )
-                game_data = game_data.astype(new_type)
+                # collect scrapped data
+                data_dict = {
+                    "GameData": {
+                        "MatchInfo": math_info,
+                        "HomeStat": team_h_p,
+                        "AwayStat": team_a_p,
+                    },
+                    "PlayerData": {
+                        "HomeTeam": home_p_df,
+                        "HomeTeamGK": home_gk_df,
+                        "AwayTeam": away_p_df,
+                        "AwayTeamGK": away_gk_df,
+                    },
+                }
 
-                # player data
+                # H5 Pre-processing for Supported Format
+
+                # initialize dataset with lists
+                if i == 1:
+                    struct_lists = init_lists(dict_data)
+
                 if player_data == True:
-                    h_p = home_p_df.iloc[:-1].to_frame().T.to_records(index=True)
-                    a_p = away_p_df.iloc[:-1].to_frame().T.to_records(index=True)
-                    home_gk = home_gk_df.to_frame().T.to_records(index=True)
-                    away_gk = away_gk_df.to_frame().T.to_records(index=True)
+                    struct_data = convert_struct(dict_data)
+                    # TODO: convert object type to <S10 for h5py handeling
+                    # append in a list
+                    struc_lists = append_np_rec(struct_data, struct_lists)
 
-                # Make List for H5 Dataset
+                # Store Data in JSON
 
-                # global stat
-                m_g_list.append(game_data)
-                m_a_list.append(team_a_p)
-                m_h_list.append(team_h_p)
+                if player_data == False:
 
-                # player stat
-                if player_data == True:
-                    p_a_l.append(a_p)
-                    p_h_l.append(h_p)
-                    gk_a_l.append(home_gk)
-                    gk_h_l.append(away_gk)
+                    # convert df to dict
+                    data_dict["GameData"]["HomeStat"].to_dict(orient="records")
+                    data_dict["GameData"]["AwayStat"].to_dict(orient="records")
 
-                # make file name unique
-                current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.h5"
-                new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.h5"
-                os.rename(current_name, new_name)
+                    # dump
+                    json.dump(data_dict["GameData"], json_file, indent=4)
+
+                    # make file name unique
+                    current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
+                    new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
+                    os.rename(current_name, new_name)
 
                 time.sleep(random.uniform(5, 10))
 
@@ -186,37 +237,9 @@ def get_data(match_links, league, season, player_data=False):
         except Exception as e:
             print(f"Error extracting table data for {match_link} : {e}")
 
-        # Write to H5 File
-
-        # convert to numpy
-        game_a = np.concatenate(m_g_list)
-        game_h_p_a = np.concatenate(m_h_list)
-        game_a_p_a = np.concatenate(m_a_list)
-        print(
-            f"""frist element:{game_h_p_a[0]}
-        Array: {game_h_p_a}
-        Datatype: {game_h_p_a[0].dtype}"""
-        )
         if player_data == True:
-            p_a_a = np.concatenate(p_a_l)
-            p_h_a = np.concatenate(p_h_l)
-            gk_a_a = np.concatenate(gk_a_l)
-            gk_h_a = np.concatenate(gk_h_l)
-
-        # TODO: create subgroup instead??
-        # write
-        team = h5_file.create_group("team_data")
-        player = h5_file.create_group("player_data")
-
-        team.create_dataset("game_info", data=game_a)
-        team.create_dataset("home_team", data=game_h_p_a)
-        team.create_dataset("away_team", data=game_a_p_a)
-
-        if player_data == True:
-            player.create_dataset("home_players", data=p_h_a)
-            player.create_dataset("away_players", data=p_h_a)
-            player.create_dataset("home_gk", data=gk_h_a)
-            player.create_dataset("away_gk", data=gk_a_a)
+            # TODO: sttore in h5
+            store_h5(sruct_lists)
 
     return
 
@@ -233,7 +256,7 @@ def get_fixtures(match_week, league=None):
     return team_list
 
 
-# TODO: only keep json with largest match data
+# TODO: only keep files with largest match data
 def del_json():
     pass
 
