@@ -120,6 +120,10 @@ def get_data(match_links, league, season, player_data=False):
                 team_h_p = home_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
                 team_a_p = away_p_df.iloc[-1, 5:].to_frame().T.to_records(index=True)
 
+                # convert to float for h5py handeling
+                team_h_p = team_h_p.astype("float")
+                team_a_p = team_a_p.astype("float")
+
                 # team general data
                 g_data = {
                     "Matchweek": int(match_week),
@@ -186,13 +190,13 @@ def get_data(match_links, league, season, player_data=False):
 
         # convert to numpy
         game_a = np.concatenate(m_g_list)
-        print(
-            f"""frist element:{game_a[0]}
-        Array: {game_a}
-        Datatype: {game_a[0].dtype}"""
-        )
         game_h_p_a = np.concatenate(m_h_list)
         game_a_p_a = np.concatenate(m_a_list)
+        print(
+            f"""frist element:{game_h_p_a[0]}
+        Array: {game_h_p_a}
+        Datatype: {game_h_p_a[0].dtype}"""
+        )
         if player_data == True:
             p_a_a = np.concatenate(p_a_l)
             p_h_a = np.concatenate(p_h_l)
