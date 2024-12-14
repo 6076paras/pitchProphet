@@ -183,9 +183,13 @@ def get_data(match_links, league, season, player_data=False):
                     "HomeXG": float(home_xG),
                     "AwayXG": float(away_xG),
                 }
-                # toal team stats
-                team_h_p = home_p_df.iloc[-1, 5:].to_frame()
-                team_a_p = away_p_df.iloc[-1, 5:].to_frame()
+                # Get last row (including headers)
+                team_h_p = home_p_df.iloc[[-1, -5], 5:]
+                team_a_p = away_p_df.iloc[[-1, -5], 5:]
+
+                # Ensure to reset the column names
+                team_h_p.columns = home_p_df.columns[5:]
+                team_a_p.columns = away_p_df.columns[5:]
 
                 # collect scrapped data
                 dict_data = {
@@ -235,9 +239,6 @@ def get_data(match_links, league, season, player_data=False):
                     struc_lists = append_np_rec(struct_data, struct_lists)
 
                 time.sleep(random.uniform(5, 10))
-
-                if i == 1:
-                    break
 
         except Exception as e:
             print(f"Error extracting table data for {match_link} : {e}")
