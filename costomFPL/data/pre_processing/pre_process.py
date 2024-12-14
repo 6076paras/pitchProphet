@@ -4,20 +4,6 @@ import pandas as pd
 import yaml
 
 
-def calc_stats(n, data):
-    """
-    Dataframe map that generates statistics, f(data_i) using last its last n
-    values
-    """
-    # standard deviation
-
-    # mean
-
-    # slope
-
-    pass
-
-
 def game_data_process(data: dict) -> pd.DataFrame:
 
     # flatten dataset
@@ -47,8 +33,6 @@ def main():
 
     # convert json game data into multi-index dataframe
     data = game_data_process(data)
-
-    #
 
 
 if __name__ == "__main__":
