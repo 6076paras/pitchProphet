@@ -130,7 +130,9 @@ def get_data(match_links, league, season, player_data=False):
         "w",
     ) as json_file:
 
+        json_file.write("[\n")
         try:
+
             for i, match_link in enumerate(match_links, start=1):
                 print(f"Processing match {i}/{total_match}")
                 tables = pd.read_html(match_link)
@@ -220,6 +222,8 @@ def get_data(match_links, league, season, player_data=False):
 
                     # dump
                     json.dump(dict_data["GameData"], json_file, indent=4)
+                    if i < total_match:
+                        json_file.write(",\n")
 
                     # make file name unique
                     current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
@@ -239,7 +243,10 @@ def get_data(match_links, league, season, player_data=False):
                     struc_lists = append_np_rec(struct_data, struct_lists)
 
                 time.sleep(random.uniform(5, 10))
+                if i == 10:
+                    break
 
+            json_file.write("\n]")
         except Exception as e:
             print(f"Error extracting table data for {match_link} : {e}")
 
