@@ -213,13 +213,18 @@ def get_data(match_links, league, season, player_data=False, json_type=True):
 
             if player_data == False:
 
+                # convert MatchInfo to df to ensure same format for json storage
+                match_info = pd.DataFrame(match_info, index=[0])
                 # convert df to dict
+                dict_data["GameData"]["MatchInfo"] = match_info.to_dict(
+                    orient="records"
+                )
                 dict_data["GameData"]["AwayStat"] = dict_data["GameData"][
                     "AwayStat"
-                ].to_dict(orient="index")
+                ].to_dict(orient="records")
                 dict_data["GameData"]["HomeStat"] = dict_data["GameData"][
                     "HomeStat"
-                ].to_dict(orient="index")
+                ].to_dict(orient="records")
 
                 # dump
                 json.dump(dict_data["GameData"], json_file, indent=4)
