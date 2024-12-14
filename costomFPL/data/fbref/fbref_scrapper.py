@@ -4,6 +4,7 @@ import random
 import re
 import sys
 import time
+from typing import Dict
 
 import h5py
 import numpy as np
@@ -69,7 +70,7 @@ def convert_struct(
         outer_key: {
             inner_key: df.to_records(index=True) for inner_key, df in outer_dict.items()
         }
-        for outer_key, outer_dict in data_dict.items()
+        for outer_key, outer_dict in data.items()
     }
 
     return data
@@ -85,7 +86,7 @@ def convert_to_list(
         outer_key: {
             inner_key: [struct_data] for inner_key, struct_data in outer_dict.items()
         }
-        for outer_key, outer_dict in data_dict.items()
+        for outer_key, outer_dict in data.items()
     }
     return data
 
@@ -96,7 +97,7 @@ def init_lists(data: Dict[str, Dict[str, pd.DataFrame]]) -> Dict[str, Dict[str, 
     """
     empty_list = {
         outer_key: {inner_key: [] for inner_key, struct_data in outer_dict.items()}
-        for outer_key, outer_dict in data_dict.items()
+        for outer_key, outer_dict in data.items()
     }
     return empty_list
 
@@ -187,9 +188,9 @@ def get_data(match_links, league, season, player_data=False):
                 team_a_p = away_p_df.iloc[-1, 5:].to_frame()
 
                 # collect scrapped data
-                data_dict = {
+                dict_data = {
                     "GameData": {
-                        "MatchInfo": math_info,
+                        "MatchInfo": match_info,
                         "HomeStat": team_h_p,
                         "AwayStat": team_a_p,
                     },
@@ -200,6 +201,26 @@ def get_data(match_links, league, season, player_data=False):
                         "AwayTeamGK": away_gk_df,
                     },
                 }
+
+                # Store Data in JSON
+
+                if player_data == False:
+
+                    # convert df to dict
+                    dict_data["GameData"]["AwayStat"] = dict_data["GameData"][
+                        "AwayStat"
+                    ].to_dict(orient="records")
+                    dict_data["GameData"]["HomeStat"] = dict_data["GameData"][
+                        "HomeStat"
+                    ].to_dict(orient="records")
+
+                    # dump
+                    json.dump(dict_data["GameData"], json_file, indent=4)
+
+                    # make file name unique
+                    current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
+                    new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
+                    os.rename(current_name, new_name)
 
                 # H5 Pre-processing for Supported Format
 
@@ -212,22 +233,6 @@ def get_data(match_links, league, season, player_data=False):
                     # TODO: convert object type to <S10 for h5py handeling
                     # append in a list
                     struc_lists = append_np_rec(struct_data, struct_lists)
-
-                # Store Data in JSON
-
-                if player_data == False:
-
-                    # convert df to dict
-                    data_dict["GameData"]["HomeStat"].to_dict(orient="records")
-                    data_dict["GameData"]["AwayStat"].to_dict(orient="records")
-
-                    # dump
-                    json.dump(data_dict["GameData"], json_file, indent=4)
-
-                    # make file name unique
-                    current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
-                    new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
-                    os.rename(current_name, new_name)
 
                 time.sleep(random.uniform(5, 10))
 
