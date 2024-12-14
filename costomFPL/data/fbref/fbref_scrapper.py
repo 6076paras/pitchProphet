@@ -119,7 +119,7 @@ def h5_store(data):
     """
 
 
-def get_data(match_links, league, season, player_data=False):
+def get_data(match_links, league, season, player_data=False, json_type=True):
 
     i = 0
     total_match = len(match_links)
@@ -131,128 +131,127 @@ def get_data(match_links, league, season, player_data=False):
     ) as json_file:
 
         json_file.write("[\n")
-        try:
 
-            for i, match_link in enumerate(match_links, start=1):
-                print(f"Processing match {i}/{total_match}")
-                tables = pd.read_html(match_link)
+        for i, match_link in enumerate(match_links, start=1):
+            print(f"Processing match {i}/{total_match}")
+            tables = pd.read_html(match_link)
 
-                # avaliable table data from the html page
-                home_p_df = tables[3]
-                home_p_df.columns = home_p_df.columns.droplevel(0)
-                home_p_df = home_p_df.loc[:, ~home_p_df.columns.duplicated()]
+            # avaliable table data from the html page
+            home_p_df = tables[3]
+            home_p_df.columns = home_p_df.columns.droplevel(0)
+            home_p_df = home_p_df.loc[:, ~home_p_df.columns.duplicated()]
 
-                home_gk_df = tables[9]
-                home_gk_df.columns = home_gk_df.columns.droplevel(0)
-                home_gk_df = home_gk_df.loc[:, ~home_gk_df.columns.duplicated()]
+            home_gk_df = tables[9]
+            home_gk_df.columns = home_gk_df.columns.droplevel(0)
+            home_gk_df = home_gk_df.loc[:, ~home_gk_df.columns.duplicated()]
 
-                away_p_df = tables[10]
-                away_p_df.columns = away_p_df.columns.droplevel(0)
-                away_p_df = away_p_df.loc[:, ~away_p_df.columns.duplicated()]
+            away_p_df = tables[10]
+            away_p_df.columns = away_p_df.columns.droplevel(0)
+            away_p_df = away_p_df.loc[:, ~away_p_df.columns.duplicated()]
 
-                away_gk_df = tables[16]
-                away_gk_df.columns = away_gk_df.columns.droplevel(0)
-                away_gk_df = away_gk_df.loc[:, ~away_gk_df.columns.duplicated()]
+            away_gk_df = tables[16]
+            away_gk_df.columns = away_gk_df.columns.droplevel(0)
+            away_gk_df = away_gk_df.loc[:, ~away_gk_df.columns.duplicated()]
 
-                # Scrapp Game Data
-
+            # Scrapp Game Data
+            try:
                 req_obj = requests.get(match_link)
                 parse_html = BeautifulSoup(req_obj.content, "html.parser")
+            except Exception as e:
+                print(f"Error extracting table data for {match_link} : {e}")
 
-                match_week = parse_html.find(string=re.compile(r"Matchweek \d+"))
-                match_week = re.sub(r"\D", "", match_week)
+            match_week = parse_html.find(string=re.compile(r"Matchweek \d+"))
+            match_week = re.sub(r"\D", "", match_week)
 
-                # xg from class="score_xg"
-                xG = parse_html.find_all(class_="score_xg")
-                home_xG = xG[0].text
-                away_xG = xG[1].text
+            # xg from class="score_xg"
+            xG = parse_html.find_all(class_="score_xg")
+            home_xG = xG[0].text
+            away_xG = xG[1].text
 
-                # goals from class="score"
-                goals = parse_html.find_all(class_="score")
-                home_goals = goals[0].text
-                away_goals = goals[1].text
+            # goals from class="score"
+            goals = parse_html.find_all(class_="score")
+            home_goals = goals[0].text
+            away_goals = goals[1].text
 
-                # team names from class="scorebox" strong anchor
-                teams = parse_html.select(".scorebox strong a")
+            # team names from class="scorebox" strong anchor
+            teams = parse_html.select(".scorebox strong a")
 
-                # match info
-                match_info = {
-                    "Matchweek": int(match_week),
-                    "HomeTeam": str(teams[0].text),
-                    "AwayTeam": str(teams[1].text),
-                    "HomeGoal": int(home_goals),
-                    "AwayGoal": int(away_goals),
-                    "HomeXG": float(home_xG),
-                    "AwayXG": float(away_xG),
-                }
-                # Get last row (including headers)
-                team_h_p = home_p_df.iloc[[-1, -5], 5:]
-                team_a_p = away_p_df.iloc[[-1, -5], 5:]
+            # match info
+            match_info = {
+                "Matchweek": int(match_week),
+                "HomeTeam": str(teams[0].text),
+                "AwayTeam": str(teams[1].text),
+                "HomeGoal": int(home_goals),
+                "AwayGoal": int(away_goals),
+                "HomeXG": float(home_xG),
+                "AwayXG": float(away_xG),
+            }
+            # Get last row (including headers)
+            team_h_p = home_p_df.iloc[[-1], 5:].reset_index(drop=True)
+            team_a_p = away_p_df.iloc[[-1], 5:].reset_index(drop=True)
 
-                # Ensure to reset the column names
-                team_h_p.columns = home_p_df.columns[5:]
-                team_a_p.columns = away_p_df.columns[5:]
+            # Ensure to reset the column names
+            team_h_p.columns = home_p_df.columns[5:]
+            team_a_p.columns = away_p_df.columns[5:]
 
-                # collect scrapped data
-                dict_data = {
-                    "GameData": {
-                        "MatchInfo": match_info,
-                        "HomeStat": team_h_p,
-                        "AwayStat": team_a_p,
-                    },
-                    "PlayerData": {
-                        "HomeTeam": home_p_df,
-                        "HomeTeamGK": home_gk_df,
-                        "AwayTeam": away_p_df,
-                        "AwayTeamGK": away_gk_df,
-                    },
-                }
+            # collect scrapped data
+            dict_data = {
+                "GameData": {
+                    "MatchInfo": match_info,
+                    "HomeStat": team_h_p,
+                    "AwayStat": team_a_p,
+                },
+                "PlayerData": {
+                    "HomeTeam": home_p_df,
+                    "HomeTeamGK": home_gk_df,
+                    "AwayTeam": away_p_df,
+                    "AwayTeamGK": away_gk_df,
+                },
+            }
 
-                # Store Data in JSON
+            # Store Data in JSON
 
-                if player_data == False:
+            if player_data == False:
 
-                    # convert df to dict
-                    dict_data["GameData"]["AwayStat"] = dict_data["GameData"][
-                        "AwayStat"
-                    ].to_dict(orient="records")
-                    dict_data["GameData"]["HomeStat"] = dict_data["GameData"][
-                        "HomeStat"
-                    ].to_dict(orient="records")
+                # convert df to dict
+                dict_data["GameData"]["AwayStat"] = dict_data["GameData"][
+                    "AwayStat"
+                ].to_dict(orient="index")
+                dict_data["GameData"]["HomeStat"] = dict_data["GameData"][
+                    "HomeStat"
+                ].to_dict(orient="index")
 
-                    # dump
-                    json.dump(dict_data["GameData"], json_file, indent=4)
-                    if i < total_match:
-                        json_file.write(",\n")
+                # dump
+                json.dump(dict_data["GameData"], json_file, indent=4)
+                if i < total_match:
+                    json_file.write(",\n")
 
-                    # make file name unique
-                    current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
-                    new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
-                    os.rename(current_name, new_name)
+                # make file name unique
+                current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
+                new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
+                os.rename(current_name, new_name)
 
-                # H5 Pre-processing for Supported Format
+            # H5 Pre-processing for Supported Format
 
-                # initialize dataset with lists
-                if i == 1:
-                    struct_lists = init_lists(dict_data)
+            # initialize dataset with lists
+            if i == 1:
+                struct_lists = init_lists(dict_data)
 
-                if player_data == True:
-                    struct_data = convert_struct(dict_data)
-                    # TODO: convert object type to <S10 for h5py handeling
-                    # append in a list
-                    struc_lists = append_np_rec(struct_data, struct_lists)
+            if player_data == True:
+                struct_data = convert_struct(dict_data)
+                # TODO: convert object type to <S10 for h5py handeling
+                # append in a list
+                struc_lists = append_np_rec(struct_data, struct_lists)
 
-                time.sleep(random.uniform(5, 10))
-                if i == 10:
-                    break
+            time.sleep(random.uniform(5, 10))
+            if i == 3:
+                break
 
-            json_file.write("\n]")
-        except Exception as e:
-            print(f"Error extracting table data for {match_link} : {e}")
+        json_file.write("\n]")
 
-        if player_data == True:
-            # TODO: sttore in h5
-            store_h5(sruct_lists)
+    if player_data == True:
+        # TODO: sttore in h5
+        store_h5(sruct_lists)
 
     return
 

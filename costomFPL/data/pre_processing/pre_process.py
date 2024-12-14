@@ -39,7 +39,7 @@ def main():
     with open(json_path, "r") as file:
         data = json.load(file)
     normalized = pd.json_normalize(data)
-    print(normalized["HomeStat"])
+    print(normalized.columns)
 
 
 if __name__ == "__main__":
