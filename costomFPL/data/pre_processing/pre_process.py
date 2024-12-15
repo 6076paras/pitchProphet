@@ -45,32 +45,39 @@ class DataFrameStats:
         Returns list of pandas dataframe for all the game related statistics
         of last n home and away matches
         """
-
-        # finding last n occurance of matches for home and away team in a given row
+        # finding last n occurance of matches for home and away team in a given row from MatchInfo
         away_team = self.data[
             (self.data["HomeTeam"] == row["AwayTeam"])
             | (self.data["AwayTeam"] == row["AwayTeam"])
-        ]
+        ].iloc[1 : self.n]
         home_team = self.data[
             (self.data["HomeTeam"] == row["HomeTeam"])
             | (self.data["AwayTeam"] == row["HomeTeam"])
-        ]
+        ].iloc[1 : self.n]
 
+        # finding position index from inner index , to filter value using outer index -> HomeStat and AwayStat
+        position_index_home = home_team.index.get_loc("MatchInfo")
+        position_index_away = away_team.index.get_loc("MatchInfo")
+
+        # use the slice object with integer position to find last n team stats
         return
 
 
 def main():
-    json_path = "/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/2023-2024-Premier-League-40-matches.json"
+    json_path = (
+        "/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/trial90.json"
+    )
 
     # convert json to python dict
     data = open_json(json_path)
 
     # convert json game data into multi-index dataframe
     data = game_data_process(data)
-    print(data)
+
     # process statistics
     stats = DataFrameStats(data, 5)
     table = stats.get_last_n_data(data.iloc[0])
+    print(table)
 
 
 if __name__ == "__main__":
