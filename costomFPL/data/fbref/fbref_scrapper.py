@@ -117,6 +117,7 @@ def h5_store(data):
     """
     Store {group:{subgroup:Dataset}} -> h5
     """
+    pass
 
 
 def get_data(match_links, league, season, player_data=False, json_type=True):
@@ -249,7 +250,7 @@ def get_data(match_links, league, season, player_data=False, json_type=True):
                 struc_lists = append_np_rec(struct_data, struct_lists)
 
             time.sleep(random.uniform(5, 10))
-            if i == 20:
+            if i == 100:
                 break
 
         json_file.write("\n]")

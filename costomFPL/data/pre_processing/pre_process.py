@@ -7,15 +7,18 @@ import yaml
 
 def game_data_process(data: dict) -> pd.DataFrame:
 
-    # flatten dataset
-    home_stat_df = pd.json_normalize(data, record_path="HomeStat")
-    away_stat_df = pd.json_normalize(data, record_path="AwayStat")
-    game_data_df = pd.json_normalize(data, record_path="MatchInfo")
+    # Flatten dataset
+    home_stat_df = pd.json_normalize(data, record_path="HomeStat").drop_duplicates()
+    away_stat_df = pd.json_normalize(data, record_path="AwayStat").drop_duplicates()
+    game_data_df = pd.json_normalize(data, record_path="MatchInfo").drop_duplicates()
 
-    # add first level index to make it multi index obj
+    # Add first level index to make it multi-indexed
     home_stat_df.index = pd.MultiIndex.from_product([["HomeStat"], home_stat_df.index])
     away_stat_df.index = pd.MultiIndex.from_product([["AwayStat"], away_stat_df.index])
     game_data_df.index = pd.MultiIndex.from_product([["MatchInfo"], game_data_df.index])
+
+    # Concatenate data along the index to maintain separation of data
+    combined_df = pd.concat([game_data_df, home_stat_df, away_stat_df], axis=0)
 
     return pd.concat([game_data_df, home_stat_df, away_stat_df])
 
@@ -42,23 +45,22 @@ class DataFrameStats:
         Returns list of pandas dataframe for all the game related statistics
         of last n home and away matches
         """
-        # filter data frame by home and away team for previous 5 games
-        home_last5 = (
-            self.data[self.data["HomeTeam"] == row["HomeTeam"]]
-            .head(self.n + 1)
-            .tail(self.n)
-        )
-        away_last5 = (
-            self.data[self.data["AwayTeam"] == row["AwayTeam"]]
-            .head(self.n + 1)
-            .tail(self.n)
-        )
 
-        return [home_last5, away_last5]
+        # finding last n occurance of matches for home and away team in a given row
+        away_team = self.data[
+            (self.data["HomeTeam"] == row["AwayTeam"])
+            | (self.data["AwayTeam"] == row["AwayTeam"])
+        ]
+        home_team = self.data[
+            (self.data["HomeTeam"] == row["HomeTeam"])
+            | (self.data["AwayTeam"] == row["HomeTeam"])
+        ]
+
+        return
 
 
 def main():
-    json_path = "/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/2023-2024-Premier-League-20-matches.json"
+    json_path = "/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/2023-2024-Premier-League-40-matches.json"
 
     # convert json to python dict
     data = open_json(json_path)
@@ -69,7 +71,6 @@ def main():
     # process statistics
     stats = DataFrameStats(data, 5)
     table = stats.get_last_n_data(data.iloc[0])
-    print(table)
 
 
 if __name__ == "__main__":
