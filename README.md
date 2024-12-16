@@ -1,5 +1,5 @@
 
-Welcome to the CustomFootball. This documentation will guide you through the setup, usage, and development of the project.
+Welcome to the pitchPropher. This documentation will guide you through the setup, usage, and development of the project.
 
 ## Table of Contents
 
@@ -25,7 +25,7 @@ The Custom FPL project is designed to provide advanced data analysis and predict
 .mypy_cache/
 .pre-commit-config.yaml
 README.md
-costomFPL/
+pitchProphet/
     .mypy_cache/
     __init__.py
     __pycache__/
@@ -99,7 +99,7 @@ get-data
 
 ### Data Preprocessing
 
-To preprocess the scraped data, use the [`pre_process.py`](command:_github.copilot.openRelativePath?%5B%22costomFPL%2Fdata%2Fpre_processing%2Fpre_process.py%22%5D "costomFPL/data/pre_processing/pre_process.py") script:
+To preprocess the scraped data, use the [`pre_process.py`](command:_github.copilot.openRelativePath?%5B%22pitchProphet%2Fdata%2Fpre_processing%2Fpre_process.py%22%5D "pitchProphet/data/pre_processing/pre_process.py") script:
 ```sh
 pre-process
 ```
@@ -108,7 +108,7 @@ pre-process
 
 To train the predictive model, run the following script:
 ```sh
-python costomFPL/models/train_model.py
+python pitchProphet/models/train_model.py
 ```
 
 ### Web Application

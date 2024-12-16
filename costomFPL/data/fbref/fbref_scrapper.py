@@ -125,7 +125,7 @@ def get_data(match_links, league, season, player_data=False, json_type=True):
     i = 0
     total_match = len(match_links)
 
-    file_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
+    file_name = f"/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/{league}-{season}-{i}-matches.json"
     with open(
         file_name,
         "w",
@@ -233,8 +233,8 @@ def get_data(match_links, league, season, player_data=False, json_type=True):
                     json_file.write(",\n")
 
                 # make file name unique
-                current_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i - 1}-matches.json"
-                new_name = f"/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/{league}-{season}-{i}-matches.json"
+                current_name = f"/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/{league}-{season}-{i - 1}-matches.json"
+                new_name = f"/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/{league}-{season}-{i}-matches.json"
                 os.rename(current_name, new_name)
 
             # H5 Pre-processing for Supported Format
@@ -280,7 +280,7 @@ def del_json():
 
 
 def main():
-    path = "/Users/paraspokharel/Programming/costomFPL/costomFPL/config/dataVars.yaml"
+    path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphethet/config/dataVars.yaml"
     with open(path, "r") as file:
         config = yaml.safe_load(file)
     url, league, season = (

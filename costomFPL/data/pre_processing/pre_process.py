@@ -39,8 +39,7 @@ class DataFrameStats:
         self.data = data
         self.n = n
 
-    # last numbers for last n matches for home team and away team
-    def get_last_n_data(self, row: pd.Series) -> List[pd.DataFrame]:
+    def get_last_n_data(self, row: pd.Series) -> Dict[str[pd.DataFrame]]:
         """
         Returns list of pandas dataframe for all the game related statistics
         of last n home and away matches
@@ -75,9 +74,7 @@ class DataFrameStats:
 
 
 def main():
-    json_path = (
-        "/Users/paraspokharel/Programming/costomFPL/costomFPL/data/fbref/trial90.json"
-    )
+    json_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/trial90.json"
 
     # convert json to python dict
     data = open_json(json_path)

@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "costomFPL"
+name = "pitchProphet"
 version = "0.1.0"
 description = ""
 authors = ["6076paras <47757847+6076paras@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-get-data = "costomFPL.data.fbref.fbref_scrapper:main"
-pre-process = "costomFPL.data.pre_processing.pre_process:main" 
+get-data = "pitchProphet.data.fbref.fbref_scrapper:main"
+pre-process = "pitchProphet.data.pre_processing.pre_process:main" 
 
 [tool.poetry.dependencies]
 python = "^3.13"
