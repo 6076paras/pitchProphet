@@ -53,14 +53,25 @@ class DataFrameStats:
         home_team = self.data[
             (self.data["HomeTeam"] == row["HomeTeam"])
             | (self.data["AwayTeam"] == row["HomeTeam"])
-        ].iloc[1 : self.n]
+        ]
 
-        # finding position index from inner index , to filter value using outer index -> HomeStat and AwayStat
-        position_index_home = home_team.index.get_loc("MatchInfo")
-        position_index_away = away_team.index.get_loc("MatchInfo")
+        # finding outer(position) index for data frame with first index is MatchInfo
+        position_index_home = home_team.index.get_level_values(1)
+        position_index_away = away_team.index.get_level_values(1)
 
-        # use the slice object with integer position to find last n team stats
-        return
+        # slice all the maching value for the obtained index
+        home_data = self.data.loc[pd.IndexSlice[:, position_index_home], :]
+        away_data = self.data.loc[pd.IndexSlice[:, position_index_away], :]
+
+        # convert into single index dataframe
+        home_data = home_data.loc["HomeStat"]
+        away_data = away_data.loc["AwayStat"]
+
+        # drop NA from multi-index part of data
+        home_data = home_data.dropna(axis=1)
+        away_data = away_data.dropna(axis=1)
+
+        return {"home_data": home_data, "away_data": away_data}
 
 
 def main():
@@ -74,10 +85,11 @@ def main():
     # convert json game data into multi-index dataframe
     data = game_data_process(data)
 
-    # process statistics
+    # Process Statistics
     stats = DataFrameStats(data, 5)
-    table = stats.get_last_n_data(data.iloc[0])
-    print(table)
+
+    # get data for last n matches for home and away team
+    last_n_data = stats.get_last_n_data(data.iloc[0])
 
 
 if __name__ == "__main__":
