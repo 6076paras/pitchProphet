@@ -7,13 +7,12 @@ Welcome to the CustomFootball. This documentation will guide you through the set
 2. [Project Structure](#project-structure)
 3. [Installation](#installation)
 4. [Usage](#usage)
-5. [Configuration](#configuration)
-6. [Data Processing](#data-processing)
-7. [Model Training](#model-training)
-8. [Web Application](#web-application)
-9. [Testing](#testing)
-10. [Contributing](#contributing)
-11. [License](#license)
+5. [Data Processing](#data-processing)
+8. [Model Training](#model-training)
+7. [Web Application](#web-application)
+8. [Testing](#testing)
+9. [Contributing](#contributing)
+
 
 ## Introduction
 
