@@ -1,9 +1,11 @@
 *monkeytype.sqlite3
 *.h5
 *ipynb_checkpoint*
-/pitchProphet/data/__pycache__/*
-*.json
+__pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.json
 *.csv
 .DS_Store
 web/node_modules/*
