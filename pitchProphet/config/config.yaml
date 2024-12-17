@@ -15,3 +15,13 @@ pre-process:
 
 root_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
 raw_Fdata: data/fbref/trial90.json
+
+scraper:
+  base_url: "https://fbref.com/en/comps"
+  league_ids:
+    Premier-League: "9"
+    Bundesliga: "20"
+  output_dir: "data/fbref"
+  sleep_range: [5, 10]
+  max_retries: 3
+  retry_delay: 60
