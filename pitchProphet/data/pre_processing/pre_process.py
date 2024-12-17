@@ -73,8 +73,8 @@ class DataFrameStats:
         match_info = self.data.loc["MatchInfo"]
 
         # debug print
-        print("\nMatch info shape:", match_info.shape)
-        print("Available teams:", match_info["HomeTeam"].unique())
+        # print("\nMatch info shape:", match_info.shape)
+        # print("Available teams:", match_info["HomeTeam"].unique())
 
         away_indices = match_info[
             (
@@ -92,7 +92,7 @@ class DataFrameStats:
             & (match_info.index != current_idx)
         ].index[: self.n]
 
-        print(f"\nFound indices - Home: {home_indices}, Away: {away_indices}")
+        # print(f"\nFound indices - Home: {home_indices}, Away: {away_indices}")
 
         # get stats for home team's matches from idx of last n home matches
         home_data = pd.DataFrame()
@@ -116,9 +116,9 @@ class DataFrameStats:
             print(f"\nAway team stats shape for match {idx}:", stats.shape)
             away_data = pd.concat([away_data, stats.to_frame().T])
 
-        print("\nFinal shapes:")
-        print("Home data:", home_data.shape)
-        print("Away data:", away_data.shape)
+        # print("\nFinal shapes:")
+        # print("Home data:", home_data.shape)
+        # print("Away data:", away_data.shape)
 
         # drop NA columns
         home_data = home_data.dropna(axis=1)
@@ -166,9 +166,9 @@ class DataFrameStats:
 
     def get_team_statistics(self, row: pd.Series) -> Dict[str, pd.DataFrame]:
         """
-        Get statistics for both home and away teams based on their last n matches
+        Get statistics a row's  both home and away teams based on their last n matches
         """
-        # cet last n matches data
+        # get last n matches data
         last_n_data = self.get_last_n_data(row)
 
         # calculate statistics for both teams
@@ -185,11 +185,11 @@ def main():
     ld_data = LoadData(json_path)
     data = ld_data.game_data_process()
 
-    print("\nDataFrame structure:")
-    print("Shape:", data.shape)
-    print("\nIndex levels:", data.index.names)
-    print("\nFirst few rows:")
-    print(data.head())
+    # print("\nDataFrame structure:")
+    # print("Shape:", data.shape)
+    # print("\nIndex levels:", data.index.names)
+    # print("\nFirst few rows:")
+    # print(data.head())
 
     # from config, choose variables for training.
 
@@ -225,7 +225,7 @@ def main():
         np.where(match_info_df["HomeGoal"] == match_info_df["AwayGoal"], 1, 2),
     )
 
-    # Verify indices match
+    # verify indices match are same across all df
     assert all(
         all_home_stats_df.index == match_info_df.index
     ), "Home stats indices don't match match info indices"
@@ -234,19 +234,21 @@ def main():
     ), "Away stats indices don't match match info indices"
     print("\nIndices verification passed: All DataFrames have matching indices")
 
-    # Save the processed dataframes with row counts in filenames
+    # save the processed dataframes with row counts in filenames
     home_rows = len(all_home_stats_df)
     away_rows = len(all_away_stats_df)
     match_rows = len(match_info_df)
 
-    all_home_stats_df.to_csv(f"home_stats_{home_rows}rows.csv")
-    all_away_stats_df.to_csv(f"away_stats_{away_rows}rows.csv")
-    match_info_df.to_csv(f"match_info_with_labels_{match_rows}rows.csv")
+    all_home_stats_df.to_csv(f"data/pre_processing/home_stats_{home_rows}rows.csv")
+    all_away_stats_df.to_csv(f"data/pre_processing/away_stats_{away_rows}rows.csv")
+    match_info_df.to_csv(
+        f"data/pre_processing/match_info_with_labels_{match_rows}rows.csv"
+    )
 
-    print("\nHome stats DataFrame shape:", all_home_stats_df.shape)
-    print("Home stats columns:", all_home_stats_df.columns)
-    print("\nAway stats DataFrame shape:", all_away_stats_df.shape)
-    print("Away stats columns:", all_away_stats_df.iloc[0])
+    # print("\nHome stats DataFrame shape:", all_home_stats_df.shape)
+    # print("Home stats columns:", all_home_stats_df.columns)
+    # print("\nAway stats DataFrame shape:", all_away_stats_df.shape)
+    # print("Away stats columns:", all_away_stats_df.iloc[0])
 
 
 if __name__ == "__main__":
