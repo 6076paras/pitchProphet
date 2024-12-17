@@ -1,4 +1,5 @@
 import json
+import sys
 from typing import Dict, List
 
 import numpy as np
@@ -56,7 +57,7 @@ class DataFrameStats:
         # get all match indices where teams played
         match_info = self.data.loc["MatchInfo"]
 
-        # Debug print
+        # debug print
         print("\nMatch info shape:", match_info.shape)
         print("Available teams:", match_info["HomeTeam"].unique())
 
@@ -65,7 +66,7 @@ class DataFrameStats:
                 (match_info["HomeTeam"] == away_team)
                 | (match_info["AwayTeam"] == away_team)
             )
-            & (match_info.index != current_idx)  # Exclude current match
+            & (match_info.index != current_idx)
         ].index[: self.n]
 
         home_indices = match_info[
@@ -73,12 +74,12 @@ class DataFrameStats:
                 (match_info["HomeTeam"] == home_team)
                 | (match_info["AwayTeam"] == home_team)
             )
-            & (match_info.index != current_idx)  # Exclude current match
+            & (match_info.index != current_idx)
         ].index[: self.n]
 
         print(f"\nFound indices - Home: {home_indices}, Away: {away_indices}")
 
-        # Get stats for home team's matches
+        # get stats for home team's matches
         home_data = pd.DataFrame()
         for idx in home_indices:
             match_slice = self.data.xs(idx, level=1)
@@ -89,7 +90,7 @@ class DataFrameStats:
             print(f"\nHome team stats shape for match {idx}:", stats.shape)
             home_data = pd.concat([home_data, stats.to_frame().T])
 
-        # Get stats for away team's matches
+        # get stats for away team's matches
         away_data = pd.DataFrame()
         for idx in away_indices:
             match_slice = self.data.xs(idx, level=1)
@@ -104,37 +105,40 @@ class DataFrameStats:
         print("Home data:", home_data.shape)
         print("Away data:", away_data.shape)
 
-        # Drop NA columns
+        # drop NA columns
         home_data = home_data.dropna(axis=1)
         away_data = away_data.dropna(axis=1)
 
         return {"home_data": home_data, "away_data": away_data}
 
     def calculate_statistics(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        Calculate various statistics for numerical columns in the dataframe
-        """
-        # Select only numeric columns
-        numeric_cols = data.select_dtypes(include=["int64", "float64"]).columns
+        # convert data to numeric where possible
+        numeric_data = data.apply(pd.to_numeric, errors="ignore")
 
-        # Calculate statistics for each numeric column
+        # select only numeric columns
+        numeric_cols = numeric_data.select_dtypes(include=["int64", "float64"]).columns
+
+        # calculate statistics for each numeric column
         stats_dict = {}
         for col in numeric_cols:
-            col_data = data[col]
+            try:
+                # basic statistics
+                stats_dict[f"{col}_mean"] = col_data.mean()
+                stats_dict[f"{col}_std"] = col_data.std() if len(col_data) > 1 else 0
 
-            # Basic statistics
-            stats_dict[f"{col}_mean"] = col_data.mean()
-            stats_dict[f"{col}_std"] = col_data.std()
-            stats_dict[f"{col}_min"] = col_data.min()
-            stats_dict[f"{col}_max"] = col_data.max()
+                # calculate slope (trend)
+                if len(col_data) > 1:
+                    x = np.arange(len(col_data))
+                    slope = np.polyfit(x, col_data, 1)[0]
+                    stats_dict[f"{col}_trend"] = slope
+            except Exception as e:
+                print(f"Error calculating statistics for column {col}: {str(e)}")
+                continue
 
-            # Calculate slope (trend) using simple linear regression
-            if len(col_data) > 1:
-                x = np.arange(len(col_data))
-                slope = np.polyfit(x, col_data, 1)[0]
-                stats_dict[f"{col}_trend"] = slope
-            else:
-                stats_dict[f"{col}_trend"] = np.nan
+        if not stats_dict:
+            print("Warning: No statistics could be calculated")
+            print("Data types:", data.dtypes)
+            print("Data sample:", data.head())
 
         return pd.Series(stats_dict)
 
@@ -167,37 +171,36 @@ def main():
     print("\nFirst few rows:")
     print(data.head())
 
-    # Process Statistics
+    # process statistics
     stats = DataFrameStats(data, 5)
 
-    # Initialize lists to store stats
+    # initialize lists to store stats
     all_home_stats = []
     all_away_stats = []
 
-    # Get match info rows
+    # get match info rows
     match_info_df = data.loc["MatchInfo"]
-    print("\nMatch info shape:", match_info_df.shape)
 
-    # Process each match
+    # process each match
     for idx in match_info_df.index:
         try:
-            print(f"\nProcessing match index: {idx}")
             match_stats = stats.get_team_statistics(match_info_df.loc[idx])
-            print("Stats calculated successfully")
+
+            # store the stats
             all_home_stats.append(match_stats["home_stats"])
             all_away_stats.append(match_stats["away_stats"])
         except Exception as e:
             print(f"Error processing match {idx}: {str(e)}")
             continue
 
-    # Create final DataFrames with match indices
+    # create final dataframes with match indices
     all_home_stats_df = pd.DataFrame(all_home_stats, index=match_info_df.index)
     all_away_stats_df = pd.DataFrame(all_away_stats, index=match_info_df.index)
 
-    print("\nHome stats DataFrame:")
-    print(all_home_stats_df)
-    print("\nAway stats DataFrame:")
-    print(all_away_stats_df)
+    print("\nHome stats DataFrame shape:", all_home_stats_df.shape)
+    print("Home stats columns:", all_home_stats_df.columns)
+    print("\nAway stats DataFrame shape:", all_away_stats_df.shape)
+    print("Away stats columns:", all_away_stats_df.iloc[0])
 
 
 if __name__ == "__main__":
