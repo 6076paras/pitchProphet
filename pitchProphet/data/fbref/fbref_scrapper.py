@@ -151,7 +151,7 @@ class FBRefScraper:
                 continue
 
         # save data
-        output_file = f"data/fbref/{league}-{season}-{len(all_matches)}-matches.json"
+        output_file = f"{self.config["output_dir"]}/{league}-{season}-{len(all_matches)}-matches.json"
         with open(output_file, "w") as f:
             json.dump(all_matches, f, indent=4)
         print(f"\nSaved {len(all_matches)} matches to {output_file}")
