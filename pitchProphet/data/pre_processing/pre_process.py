@@ -182,7 +182,8 @@ def main():
     json_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/trial90.json"
 
     # convert json game data into multi-index dataframe
-    data = LoadData(json_path)
+    ld_data = LoadData(json_path)
+    data = ld_data.game_data_process()
 
     print("\nDataFrame structure:")
     print("Shape:", data.shape)
