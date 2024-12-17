@@ -53,74 +53,7 @@ def soup_URL(url, season, league):
     return match_links
 
 
-def fix_dtype(data: Dict[str, Dict[str, np.recarray]]):
-    """
-    Find h5py unsupported type and re-assign data type for required fields
-    """
-    pass
-
-
-def convert_struct(
-    data: Dict[str, Dict[str, pd.DataFrame]]
-) -> Dict[str, Dict[str, np.recarray]]:
-    """
-    Converts pd.Dataframe -> np.records for h5py handeling
-    """
-    data = {
-        outer_key: {
-            inner_key: df.to_records(index=True) for inner_key, df in outer_dict.items()
-        }
-        for outer_key, outer_dict in data.items()
-    }
-
-    return data
-
-
-def convert_to_list(
-    data: Dict[str, Dict[str, np.recarray]]
-) -> Dict[str, Dict[str, list[np.recarray]]]:
-    """
-    convert np.recarry item to list [np.recarry]
-    """
-    data = {
-        outer_key: {
-            inner_key: [struct_data] for inner_key, struct_data in outer_dict.items()
-        }
-        for outer_key, outer_dict in data.items()
-    }
-    return data
-
-
-def init_lists(data: Dict[str, Dict[str, pd.DataFrame]]) -> Dict[str, Dict[str, list]]:
-    """
-    Initialize empty list that will later be converted to h5py dataset with np
-    """
-    empty_list = {
-        outer_key: {inner_key: [] for inner_key, struct_data in outer_dict.items()}
-        for outer_key, outer_dict in data.items()
-    }
-    return empty_list
-
-
-def append_np_rec(struct_data: dict, struct_lists: dict) -> Dict:
-    """
-    Append the np.recarray object into lists within a nested dictionary structure
-    """
-    for outer_key, outer_dict in struct_data.items():
-        for inner_key, rec_data in outer_dict.items():
-            struct_lists[outer_key][inner_key].append(rec_data)
-    return struct_lists
-
-
-# TOD0
-def h5_store(data):
-    """
-    Store {group:{subgroup:Dataset}} -> h5
-    """
-    pass
-
-
-def get_data(match_links, league, season, player_data=False, json_type=True):
+def get_data(match_links, league, season, player_data=False):
 
     i = 0
     total_match = len(match_links)
@@ -237,27 +170,9 @@ def get_data(match_links, league, season, player_data=False, json_type=True):
                 new_name = f"/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/{league}-{season}-{i}-matches.json"
                 os.rename(current_name, new_name)
 
-            # H5 Pre-processing for Supported Format
-
-            # initialize dataset with lists
-            if i == 1:
-                struct_lists = init_lists(dict_data)
-
-            if player_data == True:
-                struct_data = convert_struct(dict_data)
-                # TODO: convert object type to <S10 for h5py handeling
-                # append in a list
-                struc_lists = append_np_rec(struct_data, struct_lists)
-
             time.sleep(random.uniform(5, 10))
-            if i == 100:
-                break
 
         json_file.write("\n]")
-
-    if player_data == True:
-        # TODO: sttore in h5
-        store_h5(sruct_lists)
 
     return
 
@@ -280,7 +195,9 @@ def del_json():
 
 
 def main():
-    path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphethet/config/dataVars.yaml"
+    path = (
+        "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
+    )
     with open(path, "r") as file:
         config = yaml.safe_load(file)
     url, league, season = (
