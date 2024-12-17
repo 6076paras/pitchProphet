@@ -12,11 +12,12 @@ from bs4 import BeautifulSoup
 
 
 class FBRefScraper:
-    def __init__(self, config_path):
+    def __init__(self, config_path, player_data=False):
         # load config file
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
         self.config = config["scraper"]
+        self.player_data = player_data
 
         # setup basic logging
         logging.basicConfig(level=logging.INFO)
@@ -87,11 +88,22 @@ class FBRefScraper:
                 "AwayXG": float(xg[1].text),
             }
 
-            return {
+            game_data = {
                 "MatchInfo": match_info,
-                "HomeStat": home_stats.to_dict("records"),
-                "AwayStat": away_stats.to_dict("records"),
+                "HomeStat": home_stats["TeamStat"].to_dict("records"),
+                "AwayStat": away_stats["PlayerStat"].to_dict("records"),
             }
+            if self.player_data == True:
+                game_data["HomePlayersStat"] = (
+                    home_stats["PlayerStat"].to_dict("records"),
+                )
+                game_data["AwayPlayersStat"] = (
+                    away_stats["PlayerStat"].to_dict("records"),
+                )
+                game_data["HomeGKStat"] = (home_stats["GKStat"].to_dict("records"),)
+                game_data["AwayGKStat"] = (away_stats["GKStat"].to_dict("records"),)
+
+            return game_data
 
         except Exception as e:
             print(f"Error scraping match {match_link}: {e}")
@@ -106,8 +118,10 @@ class FBRefScraper:
         gk_df.columns = gk_df.columns.droplevel(0)
         gk_df = gk_df.loc[:, ~gk_df.columns.duplicated()]
 
-        # get team totals
-        return player_df.iloc[[-1], 5:].reset_index(drop=True)
+        team_df = player_df.iloc[[-1], 5:].reset_index(drop=True)
+        player_df = player_df.iloc[:-1]
+
+        return {"TeamStat": team_df, "PlayerStat": player_df, "GKStat": gk_df}
 
     def scrape_season(self, season, league):
         """scrape all matches in a season"""
