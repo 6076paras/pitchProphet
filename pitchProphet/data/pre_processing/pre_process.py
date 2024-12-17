@@ -112,6 +112,9 @@ class DataFrameStats:
         return {"home_data": home_data, "away_data": away_data}
 
     def calculate_statistics(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Calculate various statistics for numerical columns in the dataframe
+        """
         # convert data to numeric where possible
         numeric_data = data.apply(pd.to_numeric, errors="ignore")
 
@@ -122,6 +125,9 @@ class DataFrameStats:
         stats_dict = {}
         for col in numeric_cols:
             try:
+                # get column data
+                col_data = numeric_data[col]
+
                 # basic statistics
                 stats_dict[f"{col}_mean"] = col_data.mean()
                 stats_dict[f"{col}_std"] = col_data.std() if len(col_data) > 1 else 0
@@ -131,6 +137,9 @@ class DataFrameStats:
                     x = np.arange(len(col_data))
                     slope = np.polyfit(x, col_data, 1)[0]
                     stats_dict[f"{col}_trend"] = slope
+                else:
+                    stats_dict[f"{col}_trend"] = 0
+
             except Exception as e:
                 print(f"Error calculating statistics for column {col}: {str(e)}")
                 continue
