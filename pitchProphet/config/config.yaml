@@ -1,0 +1,17 @@
+# note: vars -> variables to omit from the FBRef player table
+get-data:
+  league: Premier-League
+  season: 2023-2024
+  league_code:
+    Premier-League: 9
+    Bundesliga: 20
+
+pre-process: 
+  vars:
+    - Gls
+    - Ast
+    - Min
+    - Ast
+
+root_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
+raw_Fdata: data/fbref/trial90.json
