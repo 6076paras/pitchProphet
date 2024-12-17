@@ -19,10 +19,8 @@ def game_data_process(data: dict) -> pd.DataFrame:
     away_stat_df.index = pd.MultiIndex.from_product([["AwayStat"], away_stat_df.index])
     game_data_df.index = pd.MultiIndex.from_product([["MatchInfo"], game_data_df.index])
 
-    # concatenate data along the index to maintain separation of data
-    combined_df = pd.concat([game_data_df, home_stat_df, away_stat_df], axis=0)
-
-    return pd.concat([game_data_df, home_stat_df, away_stat_df])
+    # stack the tree df as rows -> acts like a tensor sum!
+    return pd.concat([game_data_df, home_stat_df, away_stat_df], axis=0)
 
 
 def open_json(json_path: str) -> dict:
@@ -117,8 +115,6 @@ class DataFrameStats:
         """
         # convert data to numeric where possible
         numeric_data = data.apply(pd.to_numeric, errors="ignore")
-
-        # select only numeric columns
         numeric_cols = numeric_data.select_dtypes(include=["int64", "float64"]).columns
 
         # calculate statistics for each numeric column
