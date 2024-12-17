@@ -77,7 +77,7 @@ class DataFrameStats:
 
         print(f"\nFound indices - Home: {home_indices}, Away: {away_indices}")
 
-        # get stats for home team's matches
+        # get stats for home team's matches from idx of last n home matches
         home_data = pd.DataFrame()
         for idx in home_indices:
             match_slice = self.data.xs(idx, level=1)
@@ -88,7 +88,7 @@ class DataFrameStats:
             print(f"\nHome team stats shape for match {idx}:", stats.shape)
             home_data = pd.concat([home_data, stats.to_frame().T])
 
-        # get stats for away team's matches
+        # get stats for away team's matches from the ixs of last n away matches
         away_data = pd.DataFrame()
         for idx in away_indices:
             match_slice = self.data.xs(idx, level=1)
