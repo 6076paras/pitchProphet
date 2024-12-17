@@ -13,7 +13,7 @@ class LoadData:
         self.json_path = json_path
         self.data = self.open_json(self.json_path)
 
-    def game_data_process(self, data: dict) -> pd.DataFrame:
+    def game_data_process(self) -> pd.DataFrame:
 
         # flatten dataset
         home_stat_df = pd.json_normalize(
@@ -25,8 +25,6 @@ class LoadData:
         game_data_df = pd.json_normalize(
             self.data, record_path="MatchInfo"
         ).drop_duplicates()
-
-        # remove unwanted variables
 
         # add first level index to make it multi-indexed
         home_stat_df.index = pd.MultiIndex.from_product(
@@ -215,9 +213,34 @@ def main():
             print(f"Error processing match {idx}: {str(e)}")
             continue
 
-    # create final dataframes with match indices
+    # create final dataframes, training input X, with match indices
     all_home_stats_df = pd.DataFrame(all_home_stats, index=match_info_df.index)
     all_away_stats_df = pd.DataFrame(all_away_stats, index=match_info_df.index)
+
+    # create labels based on goals (0: home win, 1: draw, 2: away win)
+    match_info_df["label"] = np.where(
+        match_info_df["HomeGoal"] > match_info_df["AwayGoal"],
+        0,
+        np.where(match_info_df["HomeGoal"] == match_info_df["AwayGoal"], 1, 2),
+    )
+
+    # Verify indices match
+    assert all(
+        all_home_stats_df.index == match_info_df.index
+    ), "Home stats indices don't match match info indices"
+    assert all(
+        all_away_stats_df.index == match_info_df.index
+    ), "Away stats indices don't match match info indices"
+    print("\nIndices verification passed: All DataFrames have matching indices")
+
+    # Save the processed dataframes with row counts in filenames
+    home_rows = len(all_home_stats_df)
+    away_rows = len(all_away_stats_df)
+    match_rows = len(match_info_df)
+
+    all_home_stats_df.to_csv(f"home_stats_{home_rows}rows.csv")
+    all_away_stats_df.to_csv(f"away_stats_{away_rows}rows.csv")
+    match_info_df.to_csv(f"match_info_with_labels_{match_rows}rows.csv")
 
     print("\nHome stats DataFrame shape:", all_home_stats_df.shape)
     print("Home stats columns:", all_home_stats_df.columns)
