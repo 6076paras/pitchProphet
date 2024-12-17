@@ -22,6 +22,6 @@ scraper:
     Premier-League: "9"
     Bundesliga: "20"
   output_dir: "data/fbref"
-  sleep_range: [5, 10]
+  sleep_range: [10, 15]
   max_retries: 3
   retry_delay: 60
