@@ -7,26 +7,45 @@ import pandas as pd
 import yaml
 
 
-def game_data_process(data: dict) -> pd.DataFrame:
+class LoadData:
 
-    # flatten dataset
-    home_stat_df = pd.json_normalize(data, record_path="HomeStat").drop_duplicates()
-    away_stat_df = pd.json_normalize(data, record_path="AwayStat").drop_duplicates()
-    game_data_df = pd.json_normalize(data, record_path="MatchInfo").drop_duplicates()
+    def __init__(self, json_path: str):
+        self.json_path = json_path
+        self.data = self.open_json(self.json_path)
 
-    # add first level index to make it multi-indexed
-    home_stat_df.index = pd.MultiIndex.from_product([["HomeStat"], home_stat_df.index])
-    away_stat_df.index = pd.MultiIndex.from_product([["AwayStat"], away_stat_df.index])
-    game_data_df.index = pd.MultiIndex.from_product([["MatchInfo"], game_data_df.index])
+    def game_data_process(self, data: dict) -> pd.DataFrame:
 
-    # stack the tree df as rows -> acts like a tensor sum!
-    return pd.concat([game_data_df, home_stat_df, away_stat_df], axis=0)
+        # flatten dataset
+        home_stat_df = pd.json_normalize(
+            self.data, record_path="HomeStat"
+        ).drop_duplicates()
+        away_stat_df = pd.json_normalize(
+            self.data, record_path="AwayStat"
+        ).drop_duplicates()
+        game_data_df = pd.json_normalize(
+            self.data, record_path="MatchInfo"
+        ).drop_duplicates()
 
+        # remove unwanted variables
 
-def open_json(json_path: str) -> dict:
-    with open(json_path, "r") as file:
-        data = json.load(file)
-    return data
+        # add first level index to make it multi-indexed
+        home_stat_df.index = pd.MultiIndex.from_product(
+            [["HomeStat"], home_stat_df.index]
+        )
+        away_stat_df.index = pd.MultiIndex.from_product(
+            [["AwayStat"], away_stat_df.index]
+        )
+        game_data_df.index = pd.MultiIndex.from_product(
+            [["MatchInfo"], game_data_df.index]
+        )
+
+        # stack the tree df as rows -> acts like a tensor sum!
+        return pd.concat([game_data_df, home_stat_df, away_stat_df], axis=0)
+
+    def open_json(self, json_path: str) -> dict:
+        with open(json_path, "r") as file:
+            data = json.load(file)
+        return data
 
 
 class DataFrameStats:
@@ -164,11 +183,8 @@ class DataFrameStats:
 def main():
     json_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/trial90.json"
 
-    # convert json to python dict
-    data = open_json(json_path)
-
     # convert json game data into multi-index dataframe
-    data = game_data_process(data)
+    data = LoadData(json_path)
 
     print("\nDataFrame structure:")
     print("Shape:", data.shape)
@@ -176,7 +192,8 @@ def main():
     print("\nFirst few rows:")
     print(data.head())
 
-    # process statistics
+    # from config, choose variables for training.
+
     stats = DataFrameStats(data, 5)
 
     # initialize lists to store stats
