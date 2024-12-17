@@ -1,3 +1,18 @@
+"""
+Pre-processing module for soccer match data.
+
+This module handles loading and processing of soccer match statistics from JSON files.
+The core implementation strategy uses separate index-based manipulation of three main
+data components (match info, home stats, away stats) rather than hierarchical access
+(manipulating multi-indexed object at once).
+This approach provides more flexible and efficient data management.
+
+Key components:
+- LoadData: Handles JSON data loading and DataFrame creation
+- DataFrameStats: Processes statistics from the loaded DataFrames
+
+"""
+
 import json
 import sys
 from typing import Dict, List
