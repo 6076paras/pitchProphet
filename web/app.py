@@ -1,5 +1,6 @@
 import pandas as pd
-import test_prediction
+
+# import test_prediction
 from flask import Flask, render_template
 
 app = Flask(__name__)

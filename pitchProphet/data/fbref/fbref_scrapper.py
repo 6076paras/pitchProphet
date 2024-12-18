@@ -150,9 +150,6 @@ class FBRefScraper:
                 print(f"Error on match {i}: {e}")
                 continue
 
-            if i == 3:
-                break
-
         # create output directory if it doesn't exist
         os.makedirs(self.config["output_dir"], exist_ok=True)
 
@@ -167,7 +164,7 @@ def main():
     try:
         config = "pitchProphet/config/config.yaml"
         scraper = FBRefScraper(config)
-        scraper.scrape_season("2023-2024", "Premier-League")
+        scraper.scrape_season("2021-2022", "Premier-League")
     except Exception as e:
         print(f"Error in main process: {e}")
         raise
