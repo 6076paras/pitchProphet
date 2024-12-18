@@ -32,7 +32,7 @@ class FBRefScraper:
                     response.raise_for_status()
                     break
                 except requests.exceptions.HTTPError as e:
-                    if e.response.status_code == 429:  # Too Many Requests
+                    if e.response.status_code == 429:  # too Many Requests
                         wait_time = 60 * (attempt + 1)
                         print(f"\nRate limited. Waiting {wait_time} seconds...")
                         time.sleep(wait_time)
@@ -150,8 +150,14 @@ class FBRefScraper:
                 print(f"Error on match {i}: {e}")
                 continue
 
+            if i == 3:
+                break
+
+        # create output directory if it doesn't exist
+        os.makedirs(self.config["output_dir"], exist_ok=True)
+
         # save data
-        output_file = f"{self.config["output_dir"]}/{league}-{season}-{len(all_matches)}-matches.json"
+        output_file = f"{self.config['output_dir']}/{league}-{season}-{len(all_matches)}-matches.json"
         with open(output_file, "w") as f:
             json.dump(all_matches, f, indent=4)
         print(f"\nSaved {len(all_matches)} matches to {output_file}")

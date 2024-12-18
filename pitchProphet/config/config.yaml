@@ -1,11 +1,15 @@
-# note: vars -> variables to omit from the FBRef player table
-get-data:
-  league: Premier-League
-  season: 2023-2024
-  league_code:
-    Premier-League: 9
-    Bundesliga: 20
+scraper:
+  base_url: "https://fbref.com/en/comps"
+  league_ids:
+    Premier-League: "9"
+    Bundesliga: "20"
+  output_dir: "raw"
+  sleep_range: [15,20]
+  max_retries: 3
+  retry_delay: 60
+  player_data: false
 
+#note: vars -> variables to omit from the FBRef player table
 pre-process: 
   vars:
     - Gls
@@ -15,13 +19,3 @@ pre-process:
 
 root_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
 raw_Fdata: data/fbref/trial90.json
-
-scraper:
-  base_url: "https://fbref.com/en/comps"
-  league_ids:
-    Premier-League: "9"
-    Bundesliga: "20"
-  output_dir: "data/fbref"
-  sleep_range: [10, 15]
-  max_retries: 3
-  retry_delay: 60
