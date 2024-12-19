@@ -1,21 +1,45 @@
+global:
+  root_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
+  raw_Fdata: data/fbref/trial90.json
+
+
 scraper:
   base_url: "https://fbref.com/en/comps"
   league_ids:
     Premier-League: "9"
     Bundesliga: "20"
-  output_dir: "raw"
-  sleep_range: [5,10]
+  sleep_range: [7,12]
   max_retries: 3
   retry_delay: 60
   player_data: false
+  output_dir: "data/fbref/raw"
 
-#note: vars -> variables to omit from the FBRef player table
-pre-process: 
-  vars:
+processing:
+  x_vars:
     - Gls
     - Ast
-    - Min
-    - Ast
-
-root_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
-raw_Fdata: data/fbref/trial90.json
+    - PK
+    - PKatt
+    - Sh
+    - SoT
+    - CrdY
+    - CrdR
+    - Touches
+    - Tkl
+    - Int
+    - Blocks
+    - xG
+    - npxG
+    - xAG
+    - SCA
+    - GCA
+    - Cmp
+    - Att
+    - Cmp%
+    - PrgP
+    - Carries
+    - PrgC
+    - Att
+    - Succ
+  y_vars:
+    - Gls

@@ -1,6 +1,19 @@
-### Variables scrapped from FBRef.
+### Variables scrapped "from [fbref.com](https://fbref.com/en/)
 
-| Column Name | Description             |
+## Game information
+| Variables         | Description                       |
+|-------------------|-----------------------------------|
+| Matchweek         | The week or round of the match    |
+| HomeTeam          | The name of the team playing at home |
+| AwayTeam          | The name of the team playing away |
+| HomeGoals         | The expected goal for the home team |
+| AwayGoals         | The expected goal for the away team |     
+| HomeXg            | The expected goals for the home team |
+| AwayXG            | The expected goals for the away team |     
+
+
+## Player information variable for both home and way team players
+| Variables   | Description             |
 |-------------|-------------------------|
 | Player      | Name of the player      |
 | #           | Jersey number           |

@@ -1,6 +1,6 @@
 # variables to be stored in file during "pre-process"
 
-local:
+vars:
   - Gls
   - Ast
   - PK

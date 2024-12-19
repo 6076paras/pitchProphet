@@ -146,6 +146,9 @@ class FBRefScraper:
                 sleep_time = random.uniform(*self.config["sleep_range"])
                 time.sleep(sleep_time)
 
+                if i == 3:
+                    break
+
             except Exception as e:
                 print(f"Error on match {i}: {e}")
                 continue
@@ -164,7 +167,7 @@ def main():
     try:
         config = "pitchProphet/config/config.yaml"
         scraper = FBRefScraper(config)
-        scraper.scrape_season("2021-2022", "Premier-League")
+        scraper.scrape_season("2020-2021", "Premier-League")
     except Exception as e:
         print(f"Error in main process: {e}")
         raise
