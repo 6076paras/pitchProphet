@@ -1,0 +1,29 @@
+# variables to be stored in file during "pre-process"
+
+local:
+  - Gls
+  - Ast
+  - PK
+  - PKatt
+  - Sh
+  - SoT
+  - CrdY
+  - CrdR
+  - Touches
+  - Tkl
+  - Int
+  - Blocks
+  - xG
+  - npxG
+  - xAG
+  - SCA
+  - GCA
+  - Cmp
+  - Att
+  - Cmp%
+  - PrgP
+  - Carries
+  - PrgC
+  - Att
+  - Succ
+

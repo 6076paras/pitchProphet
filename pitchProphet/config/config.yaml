@@ -4,7 +4,7 @@ scraper:
     Premier-League: "9"
     Bundesliga: "20"
   output_dir: "raw"
-  sleep_range: [30,40]
+  sleep_range: [5,10]
   max_retries: 3
   retry_delay: 60
   player_data: false
