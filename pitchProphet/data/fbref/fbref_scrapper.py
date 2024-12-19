@@ -4,6 +4,7 @@ import os
 import random
 import re
 import time
+from pathlib import Path
 
 import pandas as pd
 import requests
@@ -123,6 +124,19 @@ class FBRefScraper:
 
         return {"TeamStat": team_df, "PlayerStat": player_df, "GKStat": gk_df}
 
+    def _save_matches(self, matches: list, league: str, season: str) -> None:
+        """save scraped matches to json file"""
+        # create output directory
+        root_path = Path(self.config.get("root_dir", ""))
+        output_path = root_path / self.config["output_dir"]
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        # save data
+        output_file = output_path / f"{league}-{season}-{len(matches)}-matches.json"
+        with open(output_file, "w") as f:
+            json.dump(matches, f, indent=4)
+        print(f"\nSaved {len(matches)} matches to {output_file}")
+
     def scrape_season(self, season, league):
         """scrape all matches in a season"""
         # make url
@@ -153,14 +167,8 @@ class FBRefScraper:
                 print(f"Error on match {i}: {e}")
                 continue
 
-        # create output directory if it doesn't exist
-        os.makedirs(self.config["output_dir"], exist_ok=True)
-
-        # save data
-        output_file = f"{self.config['output_dir']}/{league}-{season}-{len(all_matches)}-matches.json"
-        with open(output_file, "w") as f:
-            json.dump(all_matches, f, indent=4)
-        print(f"\nSaved {len(all_matches)} matches to {output_file}")
+        # save matches
+        self._save_matches(all_matches, league, season)
 
 
 def main():
