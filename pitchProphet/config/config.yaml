@@ -8,11 +8,11 @@ scraper:
   league_ids:
     Premier-League: "9"
     Bundesliga: "20"
-  sleep_range: [7,12]
+  sleep_range: [10,15]
   max_retries: 3
   retry_delay: 60
   player_data: false
-  output_dir: "data/fbref/raw"
+  output_dir: "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw"
 
 processing:
   x_vars:

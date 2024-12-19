@@ -127,8 +127,7 @@ class FBRefScraper:
     def _save_matches(self, matches: list, league: str, season: str) -> None:
         """save scraped matches to json file"""
         # create output directory
-        root_path = Path(self.config.get("root_dir", ""))
-        output_path = root_path / self.config["output_dir"]
+        output_path = Path(self.config["output_dir"])
         output_path.mkdir(parents=True, exist_ok=True)
 
         # save data
@@ -173,7 +172,7 @@ class FBRefScraper:
 
 def main():
     try:
-        config = "pitchProphet/config/config.yaml"
+        config = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
         scraper = FBRefScraper(config)
         scraper.scrape_season("2020-2021", "Premier-League")
     except Exception as e:
