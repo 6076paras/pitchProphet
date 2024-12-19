@@ -24,9 +24,12 @@ import yaml
 
 class LoadData:
 
-    def __init__(self, json_path: str):
+    def __init__(self, json_path: str, config_path: str):
         self.json_path = json_path
         self.data = self.open_json(self.json_path)
+        with open(config_path, "r") as file:
+            config = yaml.safe_load(file)
+        self.config = config["processing"]
 
     def game_data_process(self) -> pd.DataFrame:
 
@@ -40,6 +43,11 @@ class LoadData:
         game_data_df = pd.json_normalize(
             self.data, record_path="MatchInfo"
         ).drop_duplicates()
+
+        # filter out variables you dont want included for training
+        game_data_df, home_stat_df, away_stat_df = self.filtered(
+            game_data_df, home_stat_df, home_stat_df, self.config
+        )
 
         # add first level index to make it multi-indexed
         home_stat_df.index = pd.MultiIndex.from_product(

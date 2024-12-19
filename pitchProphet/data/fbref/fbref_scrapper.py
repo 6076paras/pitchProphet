@@ -159,9 +159,6 @@ class FBRefScraper:
                 sleep_time = random.uniform(*self.config["sleep_range"])
                 time.sleep(sleep_time)
 
-                if i == 3:
-                    break
-
             except Exception as e:
                 print(f"Error on match {i}: {e}")
                 continue
