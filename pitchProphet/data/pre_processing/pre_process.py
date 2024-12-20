@@ -59,17 +59,6 @@ class LoadData:
             [["MatchInfo"], game_data_df.index]
         )
 
-        print(
-            f"Home stats: \n {home_stat_df.head()}\n with columns: {home_stat_df.index}"
-        )
-        print(
-            f"Away stats: \n {home_stat_df.head()}\n with columns: {away_stat_df.index}"
-        )
-        print(
-            f"Match stats: \n {game_data_df.head()}\n with columns: {game_data_df.index}"
-        )
-
-        # stack the tree df as rows -> acts like a tensor sum!
         return pd.concat([game_data_df, home_stat_df, away_stat_df], axis=0)
 
     def _filter_x_vars(

@@ -39,7 +39,6 @@ processing:
     - PrgP
     - Carries
     - PrgC
-    - Att
     - Succ
   y_vars:
     - Gls
