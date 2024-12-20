@@ -210,18 +210,17 @@ class DataFrameStats:
 
 
 class Process:
-    def __init__(self, data: pd.Dataframe, all_home_stats=[], all_away_stats=[]):
+    def __init__(self, data: pd.DataFrame, all_home_stats=[], all_away_stats=[]):
         self.all_home_stats = all_home_stats
         self.all_away_stats = all_away_stats
         self.data = data
-        self.match_info_df = self.get_match_info()
+        self.match_info_df = self._get_match_info()
 
-    def get_match_info(self) -> pd.DataFrame:
-        return self.data["MatchInfo"]
+    def _get_match_info(self) -> pd.DataFrame:
+        return self.data.loc["MatchInfo"]
 
-    def process_match(self):
+    def process_all_match(self):
         """process each match one by one"""
-
         # initialize class that calculates the statistical variables for each row based on las n rows
         calc_stats = DataFrameStats(self.data, n=5)
 
@@ -301,33 +300,11 @@ def main():
     ld_data = LoadData(json_path, config_path)
     data = ld_data.game_data_process()
 
-    # process each game
     # process for mean, varience and slope data for each game, using data from last n games
-
-    # get match info
-    match_info_df = data.loc["MatchInfo"]
-
-    # process each match
-    for idx in match_info_df.index:
-        try:
-            match_stats = calc_stats.get_team_statistics(match_info_df.loc[idx])
-
-            # store the stats
-            all_home_stats.append(match_stats["home_stats"])
-            all_away_stats.append(match_stats["away_stats"])
-        except Exception as e:
-            print(f"Error processing match {idx}: {str(e)}")
-            continue
-
-    # final dataframe object
-    all_home_stats_df, all_away_stats_df, match_info_df = final_dataframe(
-        match_info_df, all_home_stats, all_away_stats
-    )
-
-    # save file
-    save_file(
-        match_info_df, all_home_stats_df, all_away_stats_df, ld_data.config["out_dir"]
-    )
+    process_games = Process(data)
+    process_games.process_all_match()
+    process_games.final_dataframe()
+    process_games.save_file(ld_data.config["out_dir"])
 
 
 if __name__ == "__main__":
