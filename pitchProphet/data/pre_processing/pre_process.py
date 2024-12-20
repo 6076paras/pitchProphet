@@ -15,6 +15,7 @@ Key components:
 
 import json
 import sys
+from pathlib import Path
 from typing import Dict, List
 
 import numpy as np
@@ -134,7 +135,6 @@ class DataFrameStats:
                 stats = match_slice.loc["HomeStat"]
             else:
                 stats = match_slice.loc["AwayStat"]
-            print(f"\nHome team stats shape for match {idx}:", stats.shape)
             home_data = pd.concat([home_data, stats.to_frame().T])
 
         # get stats for away team's matches from the ixs of last n away matches
@@ -145,7 +145,6 @@ class DataFrameStats:
                 stats = match_slice.loc["HomeStat"]
             else:
                 stats = match_slice.loc["AwayStat"]
-            print(f"\nAway team stats shape for match {idx}:", stats.shape)
             away_data = pd.concat([away_data, stats.to_frame().T])
 
         # print("\nFinal shapes:")
@@ -212,6 +211,7 @@ class DataFrameStats:
 
 def final_dataframe(match_info_df, all_home_stats, all_away_stats):
     """create final output file after processing te data"""
+
     # create final dataframes, training input X, with match indices
     all_home_stats_df = pd.DataFrame(all_home_stats, index=match_info_df.index)
     all_away_stats_df = pd.DataFrame(all_away_stats, index=match_info_df.index)
@@ -235,7 +235,7 @@ def final_dataframe(match_info_df, all_home_stats, all_away_stats):
     return all_home_stats_df, all_away_stats_df, match_info_df
 
 
-def save_file(match_info_df, all_home_stats_df, all_away_stats_df):
+def save_file(match_info_df, all_home_stats_df, all_away_stats_df, save_dir):
     """save the processed dataframes with row counts in filenames"""
 
     home_rows = len(all_home_stats_df)
@@ -247,14 +247,14 @@ def save_file(match_info_df, all_home_stats_df, all_away_stats_df):
     # print("\nAway stats DataFrame shape:", all_away_stats_df.shape)
     # print("Away stats columns:", all_away_stats_df.iloc[0])
 
-    # check directory
+    # check directory and make math
+    save_dir = Path(save_dir)
+    save_dir.mkdir(exist_ok=True, parents=True)
 
-    all_home_stats_df.to_csv(f"data/pre_processing/home_stats_{home_rows}rows.csv")
-    all_away_stats_df.to_csv(f"data/pre_processing/away_stats_{away_rows}rows.csv")
-    match_info_df.to_csv(
-        f"data/pre_processing/match_info_with_labels_{match_rows}rows.csv"
-    )
-
+    all_home_stats_df.to_csv(f"{save_dir}/home_stats_{home_rows}rows.csv")
+    all_away_stats_df.to_csv(f"{save_dir}/away_stats_{away_rows}rows.csv")
+    match_info_df.to_csv(f"{save_dir}/match_info_with_labels_{match_rows}rows.csv")
+    print(f"Files saved to {save_dir}!!")
     return
 
 
@@ -296,7 +296,9 @@ def main():
     )
 
     # save file
-    save_file(match_info_df, all_home_stats_df, all_away_stats_df)
+    save_file(
+        match_info_df, all_home_stats_df, all_away_stats_df, ld_data.config["out_dir"]
+    )
 
 
 if __name__ == "__main__":
