@@ -225,7 +225,7 @@ class Process:
         calc_stats = DataFrameStats(self.data, n=5)
 
         # iterate over eatch match
-        for idx in self.match_info_df.index():
+        for idx in self.match_info_df.index:
             try:
                 match_stats = calc_stats.get_team_statistics(
                     self.match_info_df.loc[idx]
@@ -300,9 +300,13 @@ def main():
     ld_data = LoadData(json_path, config_path)
     data = ld_data.game_data_process()
 
-    # process for mean, varience and slope data for each game, using data from last n games
+    # Process Data
     process_games = Process(data)
+
+    # calculate for mean, varience and slope data for each game and its column header, using data from last n games
     process_games.process_all_match()
+
+    # save the data as 3 separate files -> one for general game information, one for away team stat and one for home team stat
     process_games.final_dataframe()
     process_games.save_file(ld_data.config["out_dir"])
 
