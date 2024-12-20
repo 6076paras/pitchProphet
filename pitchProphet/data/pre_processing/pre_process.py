@@ -210,23 +210,65 @@ class DataFrameStats:
         return {"home_stats": home_stats, "away_stats": away_stats}
 
 
+def final_dataframe(match_info_df, all_home_stats, all_away_stats):
+    """create final output file after processing te data"""
+    # create final dataframes, training input X, with match indices
+    all_home_stats_df = pd.DataFrame(all_home_stats, index=match_info_df.index)
+    all_away_stats_df = pd.DataFrame(all_away_stats, index=match_info_df.index)
+
+    # create labels based on goals (0: home win, 1: draw, 2: away win)
+    match_info_df["label"] = np.where(
+        match_info_df["HomeGoal"] > match_info_df["AwayGoal"],
+        0,
+        np.where(match_info_df["HomeGoal"] == match_info_df["AwayGoal"], 1, 2),
+    )
+
+    # verify indices match are same across all df
+    assert all(
+        all_home_stats_df.index == match_info_df.index
+    ), "Home stats indices don't match match info indices"
+    assert all(
+        all_away_stats_df.index == match_info_df.index
+    ), "Away stats indices don't match match info indices"
+    print("\nIndices verification passed: All DataFrames have matching indices")
+
+    return all_home_stats_df, all_away_stats_df, match_info_df
+
+
+def save_file(match_info_df, all_home_stats_df, all_away_stats_df):
+    """save the processed dataframes with row counts in filenames"""
+
+    home_rows = len(all_home_stats_df)
+    away_rows = len(all_away_stats_df)
+    match_rows = len(match_info_df)
+
+    # print("\nHome stats DataFrame shape:", all_home_stats_df.shape)
+    # print("Home stats columns:", all_home_stats_df.columns)
+    # print("\nAway stats DataFrame shape:", all_away_stats_df.shape)
+    # print("Away stats columns:", all_away_stats_df.iloc[0])
+
+    # check directory
+
+    all_home_stats_df.to_csv(f"data/pre_processing/home_stats_{home_rows}rows.csv")
+    all_away_stats_df.to_csv(f"data/pre_processing/away_stats_{away_rows}rows.csv")
+    match_info_df.to_csv(
+        f"data/pre_processing/match_info_with_labels_{match_rows}rows.csv"
+    )
+
+    return
+
+
 def main():
     json_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/trial90.json"
     config_path = (
         "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
     )
+
     # convert json game data into multi-index dataframe
     ld_data = LoadData(json_path, config_path)
     data = ld_data.game_data_process()
 
-    # print("\nDataFrame structure:")
-    # print("Shape:", data.shape)
-    print("\nIndex levels:", data.index.names)
-    print("\nFirst few rows:")
-    print(data.head())
-    sys.exit()
-    # from config, choose variables for training.
-
+    # initialize class that calculates the statistical variables for each row based on las n rows
     stats = DataFrameStats(data, 5)
 
     # initialize lists to store stats
@@ -248,41 +290,13 @@ def main():
             print(f"Error processing match {idx}: {str(e)}")
             continue
 
-    # create final dataframes, training input X, with match indices
-    all_home_stats_df = pd.DataFrame(all_home_stats, index=match_info_df.index)
-    all_away_stats_df = pd.DataFrame(all_away_stats, index=match_info_df.index)
-
-    # create labels based on goals (0: home win, 1: draw, 2: away win)
-    match_info_df["label"] = np.where(
-        match_info_df["HomeGoal"] > match_info_df["AwayGoal"],
-        0,
-        np.where(match_info_df["HomeGoal"] == match_info_df["AwayGoal"], 1, 2),
+    # final dataframe object
+    all_home_stats_df, all_away_stats_df, match_info_df = final_dataframe(
+        match_info_df, all_home_stats, all_away_stats
     )
 
-    # verify indices match are same across all df
-    assert all(
-        all_home_stats_df.index == match_info_df.index
-    ), "Home stats indices don't match match info indices"
-    assert all(
-        all_away_stats_df.index == match_info_df.index
-    ), "Away stats indices don't match match info indices"
-    print("\nIndices verification passed: All DataFrames have matching indices")
-
-    # save the processed dataframes with row counts in filenames
-    home_rows = len(all_home_stats_df)
-    away_rows = len(all_away_stats_df)
-    match_rows = len(match_info_df)
-
-    all_home_stats_df.to_csv(f"data/pre_processing/home_stats_{home_rows}rows.csv")
-    all_away_stats_df.to_csv(f"data/pre_processing/away_stats_{away_rows}rows.csv")
-    match_info_df.to_csv(
-        f"data/pre_processing/match_info_with_labels_{match_rows}rows.csv"
-    )
-
-    # print("\nHome stats DataFrame shape:", all_home_stats_df.shape)
-    # print("Home stats columns:", all_home_stats_df.columns)
-    # print("\nAway stats DataFrame shape:", all_away_stats_df.shape)
-    # print("Away stats columns:", all_away_stats_df.iloc[0])
+    # save file
+    save_file(match_info_df, all_home_stats_df, all_away_stats_df)
 
 
 if __name__ == "__main__":
