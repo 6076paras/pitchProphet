@@ -150,9 +150,15 @@ class DataFrameStats:
         """
         Calculate various statistics for numerical columns in the dataframe
         """
+
         # convert data to numeric where possible
-        numeric_data = data.apply(pd.to_numeric, errors="ignore")
-        numeric_cols = numeric_data.select_dtypes(include=["int64", "float64"]).columns
+        try:
+            numeric_data = data.apply(pd.to_numeric)
+            numeric_cols = numeric_data.select_dtypes(
+                include=["int64", "float64"]
+            ).columns
+        except ValueError as e:
+            print(f"Error converting column {col} to numeric: {str(e)}")
 
         # calculate statistics for each numeric column
         stats_dict = {}
@@ -246,6 +252,8 @@ class Process:
                 self.match_info_df["HomeGoal"] == self.match_info_df["AwayGoal"], 1, 2
             ),
         )
+        # drop n/a
+        self.match_info_df = self.match_info_df.dropna(axis=1)
 
         # verify indices match are same across all df
         assert all(
