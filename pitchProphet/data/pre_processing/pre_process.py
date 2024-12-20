@@ -26,10 +26,9 @@ class LoadData:
 
     def __init__(self, json_path: str, config_path: str):
         self.json_path = json_path
-        self.data = self.open_json(self.json_path)
-        with open(config_path, "r") as file:
-            config = yaml.safe_load(file)
-        self.config = config["processing"]
+        self.config_path = config_path
+        self.data = self._open_json(self.json_path)
+        self.config = self._open_yaml(self.config_path)["processing"]
 
     def game_data_process(self) -> pd.DataFrame:
 
@@ -44,9 +43,9 @@ class LoadData:
             self.data, record_path="MatchInfo"
         ).drop_duplicates()
 
-        # filter out variables you dont want included for training
-        game_data_df, home_stat_df, away_stat_df = self.filtered(
-            game_data_df, home_stat_df, home_stat_df, self.config
+        # filter out variables as defined in config file
+        home_stat_df, away_stat_df = self._filter_x_vars(
+            home_stat_df, away_stat_df, self.config["x_vars"]
         )
 
         # add first level index to make it multi-indexed
@@ -63,10 +62,21 @@ class LoadData:
         # stack the tree df as rows -> acts like a tensor sum!
         return pd.concat([game_data_df, home_stat_df, away_stat_df], axis=0)
 
-    def open_json(self, json_path: str) -> dict:
+    def _filter_x_vars(
+        self, home_player_df: pd.DataFrame, away_player_df: pd.DataFrame, x_vars: list
+    ):
+        """only include variables listed in config"""
+        return home_player_df[x_vars], away_player_df[x_vars]
+
+    def _open_json(self, json_path: str) -> dict:
         with open(json_path, "r") as file:
             data = json.load(file)
         return data
+
+    def _open_yaml(self, config_path: str) -> dict:
+        with open(config_path, "r") as file:
+            config = yaml.safe_load(file)
+        return config
 
 
 class DataFrameStats:
@@ -202,18 +212,20 @@ class DataFrameStats:
 
 
 def main():
-    json_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/trial90.json"
-
+    json_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/trial90.json"
+    config_path = (
+        "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
+    )
     # convert json game data into multi-index dataframe
-    ld_data = LoadData(json_path)
+    ld_data = LoadData(json_path, config_path)
     data = ld_data.game_data_process()
 
     # print("\nDataFrame structure:")
     # print("Shape:", data.shape)
-    # print("\nIndex levels:", data.index.names)
-    # print("\nFirst few rows:")
-    # print(data.head())
-
+    print("\nIndex levels:", data.index.names)
+    print("\nFirst few rows:")
+    print(data.head())
+    sys.exit()
     # from config, choose variables for training.
 
     stats = DataFrameStats(data, 5)
