@@ -14,7 +14,6 @@ Key components:
 """
 
 import json
-import sys
 from pathlib import Path
 from typing import Dict, List
 
@@ -105,10 +104,6 @@ class DataFrameStats:
         # get all match indices where teams played
         match_info = self.data.loc["MatchInfo"]
 
-        # debug print
-        # print("\nMatch info shape:", match_info.shape)
-        # print("Available teams:", match_info["HomeTeam"].unique())
-
         away_indices = match_info[
             (
                 (match_info["HomeTeam"] == away_team)
@@ -124,8 +119,6 @@ class DataFrameStats:
             )
             & (match_info.index != current_idx)
         ].index[: self.n]
-
-        # print(f"\nFound indices - Home: {home_indices}, Away: {away_indices}")
 
         # get stats for home team's matches from idx of last n home matches
         home_data = pd.DataFrame()
@@ -146,10 +139,6 @@ class DataFrameStats:
             else:
                 stats = match_slice.loc["AwayStat"]
             away_data = pd.concat([away_data, stats.to_frame().T])
-
-        # print("\nFinal shapes:")
-        # print("Home data:", home_data.shape)
-        # print("Away data:", away_data.shape)
 
         # drop NA columns
         home_data = home_data.dropna(axis=1)
