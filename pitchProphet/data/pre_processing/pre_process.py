@@ -85,7 +85,7 @@ class DataFrameStats:
     Description: This class provides methods for calculating various statistics for the data.
     """
 
-    def __init__(self, data: pd.DataFrame, n: int):
+    def __init__(self, data: pd.DataFrame, n=5):
         self.data = data
         self.n = n
 
@@ -209,53 +209,86 @@ class DataFrameStats:
         return {"home_stats": home_stats, "away_stats": away_stats}
 
 
-def final_dataframe(match_info_df, all_home_stats, all_away_stats):
-    """create final output file after processing te data"""
+class Process:
+    def __init__(self, data: pd.Dataframe, all_home_stats=[], all_away_stats=[]):
+        self.all_home_stats = all_home_stats
+        self.all_away_stats = all_away_stats
+        self.data = data
+        self.match_info_df = self.get_match_info()
 
-    # create final dataframes, training input X, with match indices
-    all_home_stats_df = pd.DataFrame(all_home_stats, index=match_info_df.index)
-    all_away_stats_df = pd.DataFrame(all_away_stats, index=match_info_df.index)
+    def get_match_info(self) -> pd.DataFrame:
+        return self.data["MatchInfo"]
 
-    # create labels based on goals (0: home win, 1: draw, 2: away win)
-    match_info_df["label"] = np.where(
-        match_info_df["HomeGoal"] > match_info_df["AwayGoal"],
-        0,
-        np.where(match_info_df["HomeGoal"] == match_info_df["AwayGoal"], 1, 2),
-    )
+    def process_match(self):
+        """process each match one by one"""
 
-    # verify indices match are same across all df
-    assert all(
-        all_home_stats_df.index == match_info_df.index
-    ), "Home stats indices don't match match info indices"
-    assert all(
-        all_away_stats_df.index == match_info_df.index
-    ), "Away stats indices don't match match info indices"
-    print("\nIndices verification passed: All DataFrames have matching indices")
+        # initialize class that calculates the statistical variables for each row based on las n rows
+        calc_stats = DataFrameStats(self.data, n=5)
 
-    return all_home_stats_df, all_away_stats_df, match_info_df
+        # iterate over eatch match
+        for idx in self.match_info_df.index():
+            try:
+                match_stats = calc_stats.get_team_statistics(
+                    self.match_info_df.loc[idx]
+                )
+                # store the stats
+                self.all_home_stats.append(match_stats["home_stats"])
+                self.all_away_stats.append(match_stats["away_stats"])
+            except Exception as e:
+                print(f"Error processing match {idx}: {str(e)}")
+            continue
+        return
 
+    def final_dataframe(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        """create final output file after processing te data"""
 
-def save_file(match_info_df, all_home_stats_df, all_away_stats_df, save_dir):
-    """save the processed dataframes with row counts in filenames"""
+        # create final dataframes, training input X, with match indices
+        self.all_home_stats = pd.DataFrame(
+            self.all_home_stats, index=self.match_info_df.index
+        )
+        self.all_away_stats = pd.DataFrame(
+            self.all_away_stats, index=self.match_info_df.index
+        )
 
-    home_rows = len(all_home_stats_df)
-    away_rows = len(all_away_stats_df)
-    match_rows = len(match_info_df)
+        # create labels based on goals (0: home win, 1: draw, 2: away win)
+        self.match_info_df["label"] = np.where(
+            self.match_info_df["HomeGoal"] > self.match_info_df["AwayGoal"],
+            0,
+            np.where(
+                self.match_info_df["HomeGoal"] == self.match_info_df["AwayGoal"], 1, 2
+            ),
+        )
 
-    # print("\nHome stats DataFrame shape:", all_home_stats_df.shape)
-    # print("Home stats columns:", all_home_stats_df.columns)
-    # print("\nAway stats DataFrame shape:", all_away_stats_df.shape)
-    # print("Away stats columns:", all_away_stats_df.iloc[0])
+        # verify indices match are same across all df
+        assert all(
+            self.all_home_stats.index == self.match_info_df.index
+        ), "Home stats indices don't match match info indices"
+        assert all(
+            self.all_away_stats.index == self.match_info_df.index
+        ), "Away stats indices don't match match info indices"
+        print("\nIndices verification passed: All DataFrames have matching indices")
+        return
 
-    # check directory and make math
-    save_dir = Path(save_dir)
-    save_dir.mkdir(exist_ok=True, parents=True)
+    def save_file(self, save_dir):
+        """save the processed dataframes with row counts in filenames"""
 
-    all_home_stats_df.to_csv(f"{save_dir}/home_stats_{home_rows}rows.csv")
-    all_away_stats_df.to_csv(f"{save_dir}/away_stats_{away_rows}rows.csv")
-    match_info_df.to_csv(f"{save_dir}/match_info_with_labels_{match_rows}rows.csv")
-    print(f"Files saved to {save_dir}!!")
-    return
+        home_rows = len(self.all_home_stats)
+        away_rows = len(self.all_away_stats)
+        match_rows = len(self.match_info_df)
+
+        # check directory and make math
+        save_dir = Path(save_dir)
+        save_dir.mkdir(exist_ok=True, parents=True)
+
+        self.all_home_stats.to_csv(f"{save_dir}/home_stats_{home_rows}rows.csv")
+        self.all_away_stats.to_csv(f"{save_dir}/away_stats_{away_rows}rows.csv")
+        self.match_info_df.to_csv(
+            f"{save_dir}/match_info_with_labels_{match_rows}rows.csv"
+        )
+
+        print(f"Files saved to {save_dir}!!")
+
+        return
 
 
 def main():
@@ -268,20 +301,16 @@ def main():
     ld_data = LoadData(json_path, config_path)
     data = ld_data.game_data_process()
 
-    # initialize class that calculates the statistical variables for each row based on las n rows
-    stats = DataFrameStats(data, 5)
+    # process each game
+    # process for mean, varience and slope data for each game, using data from last n games
 
-    # initialize lists to store stats
-    all_home_stats = []
-    all_away_stats = []
-
-    # get match info rows
+    # get match info
     match_info_df = data.loc["MatchInfo"]
 
     # process each match
     for idx in match_info_df.index:
         try:
-            match_stats = stats.get_team_statistics(match_info_df.loc[idx])
+            match_stats = calc_stats.get_team_statistics(match_info_df.loc[idx])
 
             # store the stats
             all_home_stats.append(match_stats["home_stats"])
