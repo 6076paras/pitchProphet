@@ -1,7 +1,7 @@
 global:
   root_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
   raw_Fdata: data/fbref/trial90.json
-
+  processed_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/pre_processing/processed
 
 scraper:
   base_url: "https://fbref.com/en/comps"

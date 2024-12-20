@@ -1,6 +1,9 @@
 
 Welcome to the pitchPropher. This documentation will guide you through the setup, usage, and development of the project.
 
+# Project Status 🚧
+This project is currently under construction. Features are being added and updated regularly. 
+
 ## Table of Contents
 
 1. [Introduction](#introduction)
