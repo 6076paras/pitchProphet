@@ -31,6 +31,9 @@ black = "^24.10.0"
 flake8 = "^7.1.1"
 monkeytype = "^23.3.0"
 flask = "^3.1.0"
+isort = "^5.13.2"
+nbqa = "^1.9.1"
+nbstripout = "^0.8.1"
 
 [build-system]
 requires = ["poetry-core"]
