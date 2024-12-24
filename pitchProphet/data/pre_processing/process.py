@@ -1,8 +1,9 @@
 from pathlib import Path
 
-import DataFrameStats
 import numpy as np
 import pandas as pd
+
+from pitchProphet.data.pre_processing.calculate_stats import DataFrameStats
 
 
 class Process:
