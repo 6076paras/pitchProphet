@@ -1,5 +1,5 @@
 
-Welcome to the pitchPropher. This documentation will guide you through the setup, usage, and development of the project.
+Welcome to the pitchProphet. This documentation will guide you through the setup, usage, and development of the project.
 
 # Project Status 🚧
 This project is currently under construction. Features are being added and updated regularly. 
