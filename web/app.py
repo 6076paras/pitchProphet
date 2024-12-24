@@ -1,6 +1,10 @@
+# import test_prediction
+import sys
+
 import pandas as pd
 
-# import test_prediction
+sys.path.append("../tests")
+import test_prediction
 from flask import Flask, render_template
 
 app = Flask(__name__)
