@@ -8,7 +8,7 @@ data components (match info, home stats, away stats) rather than hierarchical ac
 
 Key components:
 - LoadData: Handles JSON data loading and DataFrame creation
-- DataFrameStats: Processes data for statistics such as mean, varience..for reach 
+- DescriptiveStats: Processes data for statistics such as mean, varience..for reach 
     home and away teams's last n matches. 
 
 """

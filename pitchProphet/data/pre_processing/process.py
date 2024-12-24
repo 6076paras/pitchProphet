@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from pitchProphet.data.pre_processing.calculate_stats import DataFrameStats
+from pitchProphet.data.pre_processing.calculate_stats import DescriptiveStats
 
 
 class Process:
@@ -19,12 +19,12 @@ class Process:
     def process_all_match(self):
         """process each match one by one"""
         # initialize class that calculates the statistical variables for each row based on las n rows
-        calc_stats = DataFrameStats(self.data, n=5)
+        calc_stats = DescriptiveStats(self.data, n=5)
 
         # iterate over eatch match
         for idx in self.match_info_df.index:
             try:
-                match_stats = calc_stats.get_team_statistics(
+                match_stats = calc_stats.process_home_away_features(
                     self.match_info_df.loc[idx]
                 )
                 # store the stats

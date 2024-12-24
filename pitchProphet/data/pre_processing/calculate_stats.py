@@ -1,13 +1,41 @@
+"""
+Note to self: 
+"""
+
 from typing import Dict
 
 import numpy as np
 import pandas as pd
 
 
-class DataFrameStats:
+class DescriptiveStats:
     """
-    Class: DataFrameStat
-    Description: This class provides methods for calculating various statistics for the data.
+    Class to clculate and return descroptive statistics suchch as mean, varience..
+    for reach row (match week in this case), using last n team features for both
+    home and away teams separately.
+
+    Attributes:
+        data (pd.DataFrame): DataFrame containing match data obtained
+            from LoadData class.
+        n (int): Number of previous matches to consider to calculate
+            descriptive statiscics - such as mean, variaence and slope.
+
+    Methods:
+        get_last_n_data(row: pd.Series) -> Dict[str, pd.DataFrame]:
+            Retrieves last n matches' "genearal game info" features for
+            both home and away teams. Its inner index is used to extract
+            home team statistics and away team statistics for the last
+            game using process_home_away_features().
+
+        process_home_away_features(row: pd.Series) -> Dict[str, pd.Series]:
+            Returns descriptive statistics for a matchby calling
+            calculate_statisctics() using data from get_last_n_data().
+
+        calculate_statistics(data: pd.DataFrame) -> pd.Series:
+            Computes (descriptive) statistical metrics for all features
+            using last n home and away team's matches features.
+
+
     """
 
     def __init__(self, data: pd.DataFrame, n=5):
@@ -73,9 +101,7 @@ class DataFrameStats:
         return {"home_data": home_data, "away_data": away_data}
 
     def calculate_statistics(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        Calculate various statistics for numerical columns in the dataframe
-        """
+        """calculate various statistics for numerical columns in the dataframe"""
 
         # convert data to numeric where possible
         try:
@@ -116,7 +142,7 @@ class DataFrameStats:
 
         return pd.Series(stats_dict)
 
-    def get_team_statistics(self, row: pd.Series) -> Dict[str, pd.DataFrame]:
+    def process_home_away_features(self, row: pd.Series) -> Dict[str, pd.DataFrame]:
         """
         Get statistics a row's  both home and away teams based on their last n matches
         """
