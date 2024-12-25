@@ -60,6 +60,10 @@ class DescriptiveStats:
             & (match_info.index != current_idx)
         ].index[: self.n]
 
+        print(
+            f"last 5 home index: {home_indices} \n last 5 away indices: {away_indices}"
+        )
+
         # get stats for home team's matches from idx of last n home matches
         home_data = pd.DataFrame()
         for idx in home_indices:

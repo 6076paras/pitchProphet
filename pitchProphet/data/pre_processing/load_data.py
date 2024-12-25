@@ -60,8 +60,10 @@ class LoadData:
         game_data_df.index = pd.MultiIndex.from_product(
             [["MatchInfo"], game_data_df.index]
         )
+        game_data = pd.concat([game_data_df, home_stat_df, away_stat_df], axis=0)
 
-        return pd.concat([game_data_df, home_stat_df, away_stat_df], axis=0)
+        # retrun the order of rows, as the last game should be first in the table
+        return game_data.iloc[::-1]
 
     def _filter_x_vars(
         self, home_player_df: pd.DataFrame, away_player_df: pd.DataFrame, x_vars: list
