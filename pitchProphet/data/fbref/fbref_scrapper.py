@@ -13,6 +13,27 @@ from bs4 import BeautifulSoup
 
 
 class FBRefScraper:
+    """
+    Class for scraping football match data from FBref.
+
+    This class handles the scraping of match data, including team statistics, player statistics
+    and match information.
+
+    Attributes:
+        config (dict): Configuration settings for the scraper.
+        player_data (bool): Flag to indicate whether to scrap individual player statistics.
+
+    Methods:
+        get_match_links(url: str, league: str) -> list:
+            Retrieves all match links for a given league and season.
+
+        scrape_match(match_link: str) -> dict:
+            Scrapes data for a single match.
+
+        scrape_season(season: str, league: str) -> None:
+            Iterates over scrape_match for all matches in a season
+    """
+
     def __init__(self, config_path, player_data=False):
         # load config file
         with open(config_path, "r") as f:
