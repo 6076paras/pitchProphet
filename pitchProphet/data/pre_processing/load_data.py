@@ -1,4 +1,6 @@
+import glob
 import json
+from typing import List
 
 import pandas as pd
 import yaml
@@ -10,17 +12,17 @@ class LoadData:
     fbref.com to pandas dataframe.
 
     Attributes:
-        json_path (str): Path to the JSON file with match data.
+        json_dir (str): Path to the JSON file with match data.
         config_path (str): Path to the YAML configuration file.
     Methods:
         game_data_process() -> pd.DataFrame:
             Processes and returns a DataFrame of all match data.
     """
 
-    def __init__(self, json_path: str, config_path: str):
-        self.json_path = json_path
+    def __init__(self, json_dir: str, config_path: str):
+        self.json_dir = json_dir
         self.config_path = config_path
-        self.data = self._open_json(self.json_path)
+        self.data = self._open_json(self._find_relv_files())
         self.config = self._open_yaml(self.config_path)["processing"]
 
     def game_data_process(self) -> pd.DataFrame:
@@ -69,10 +71,20 @@ class LoadData:
         """only include variables listed in config"""
         return home_player_df[x_vars], away_player_df[x_vars]
 
-    def _open_json(self, json_path: str) -> dict:
-        with open(json_path, "r") as file:
-            data = json.load(file)
-        return data
+    def _find_relv_files(self):
+        """iterate throguh raw file dir and return relevent files"""
+        # TODO: more filters
+        return glob.glob(f"{self.json_dir}/*matches.json")
+
+    def _open_json(self, all_json: List[str]) -> dict:
+        combined_data = []
+        for file in all_json:
+            with open(file, "r") as file:
+                data = json.load(file)
+                combined_data.extend(data)
+        print(f"combined data: {len(combined_data)}")
+        print(f"all json: {all_json}")
+        return combined_data
 
     def _open_yaml(self, config_path: str) -> dict:
         with open(config_path, "r") as file:
