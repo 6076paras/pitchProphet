@@ -10,9 +10,9 @@ import pandas as pd
 
 class DescriptiveStats:
     """
-    Class to clculate and return descroptive statistics suchch as mean, varience..
-    for reach row (match week in this case), using last n team features for both
-    home and away teams separately.
+    Class to calculate and return descriptive statistics such as mean, varience
+    and slope for reach row (match), using last n team features
+    for both home and away teams separately.
 
     Attributes:
         data (pd.DataFrame): DataFrame containing match data obtained
@@ -21,20 +21,10 @@ class DescriptiveStats:
             descriptive statiscics - such as mean, variaence and slope.
 
     Methods:
-        get_last_n_data(row: pd.Series) -> Dict[str, pd.DataFrame]:
-            Retrieves last n matches' "genearal game info" features for
-            both home and away teams. Its inner index is used to extract
-            home team statistics and away team statistics for the last
-            game using process_home_away_features().
-
         process_home_away_features(row: pd.Series) -> Dict[str, pd.Series]:
-            Returns descriptive statistics for a matchby calling
-            calculate_statisctics() using data from get_last_n_data().
-
-        calculate_statistics(data: pd.DataFrame) -> pd.Series:
-            Computes (descriptive) statistical metrics for all features
-            using last n home and away team's matches features.
-
+            Returns descriptive statistics for a match by calling
+            _calculate_statisctics() using home and away team data from
+            _get_last_n_data().
 
     """
 
@@ -42,11 +32,11 @@ class DescriptiveStats:
         self.data = data
         self.n = n
 
-    def get_last_n_data(self, row: pd.Series) -> Dict[str, pd.DataFrame]:
-        """
-        Returns list of pandas dataframe for all the game related statistics
-        of last n home and away matches
-        """
+    def _get_last_n_data(self, row: pd.Series) -> Dict[str, pd.DataFrame]:
+        """retrieves last n matches' home team features and away team features.
+        it uses inner index from MatchInfo outer index to acess home and away team's
+        features for last n games."""
+
         # get team names from the match info
         home_team = row["HomeTeam"]
         away_team = row["AwayTeam"]
@@ -100,8 +90,9 @@ class DescriptiveStats:
 
         return {"home_data": home_data, "away_data": away_data}
 
-    def calculate_statistics(self, data: pd.DataFrame) -> pd.DataFrame:
-        """calculate various statistics for numerical columns in the dataframe"""
+    def _calculate_statistics(self, data: pd.DataFrame) -> pd.DataFrame:
+        """computes (descriptive) statistical metrics for all features
+        using input table of last n game's features."""
 
         # convert data to numeric where possible
         try:
@@ -143,14 +134,13 @@ class DescriptiveStats:
         return pd.Series(stats_dict)
 
     def process_home_away_features(self, row: pd.Series) -> Dict[str, pd.DataFrame]:
-        """
-        Get statistics a row's  both home and away teams based on their last n matches
-        """
+        """get descriptive statistics for a match for both home and away team"""
+
         # get last n matches data
-        last_n_data = self.get_last_n_data(row)
+        last_n_data = self._get_last_n_data(row)
 
         # calculate statistics for both teams
-        home_stats = self.calculate_statistics(last_n_data["home_data"])
-        away_stats = self.calculate_statistics(last_n_data["away_data"])
+        home_stats = self._calculate_statistics(last_n_data["home_data"])
+        away_stats = self._calculate_statistics(last_n_data["away_data"])
 
         return {"home_stats": home_stats, "away_stats": away_stats}
