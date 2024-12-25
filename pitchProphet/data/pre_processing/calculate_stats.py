@@ -49,7 +49,7 @@ class DescriptiveStats:
                 (match_info["HomeTeam"] == away_team)
                 | (match_info["AwayTeam"] == away_team)
             )
-            & (match_info.index != current_idx)
+            & (match_info.index < current_idx)
         ].index[: self.n]
 
         home_indices = match_info[
@@ -57,7 +57,7 @@ class DescriptiveStats:
                 (match_info["HomeTeam"] == home_team)
                 | (match_info["AwayTeam"] == home_team)
             )
-            & (match_info.index != current_idx)
+            & (match_info.index < current_idx)
         ].index[: self.n]
 
         print(
