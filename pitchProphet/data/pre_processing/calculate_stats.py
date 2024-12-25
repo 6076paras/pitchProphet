@@ -90,7 +90,7 @@ class DescriptiveStats:
 
         return {"home_data": home_data, "away_data": away_data}
 
-    def _calculate_statistics(self, data: pd.DataFrame) -> pd.DataFrame:
+    def _calculate_statistics(self, data: pd.DataFrame) -> pd.Series:
         """computes (descriptive) statistical metrics for all features
         using input table of last n game's features."""
 
