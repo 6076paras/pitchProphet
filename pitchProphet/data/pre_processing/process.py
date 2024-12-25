@@ -7,6 +7,31 @@ from pitchProphet.data.pre_processing.calculate_stats import DescriptiveStats
 
 
 class Process:
+    """
+    Class for processing all football match data to add descriptive statistics.
+
+    This class iterates over all matches, applying the `process_home_away_features`
+    method from the `DescriptiveStats` class to calculate statistics for each match.
+    It generates a processed DataFrame separately for all home team statistics,
+    all away team statistics saves those separatly. This is used as x variable for training.
+    It also saves a separete file that has general game information that can be used as
+    y label variable for training.
+
+    Attributes:
+        data (pd.DataFrame): DataFrame containing all match data.
+
+
+    Methods:
+        process_all_match() -> None:
+            Calculates and stores statistics for each match.
+
+        final_dataframe() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+            Generates final DataFrames with match outcome labels.
+
+        save_file(save_dir: str) -> None:
+            Saves processed DataFrames to CSV files in the specified directory.
+    """
+
     def __init__(self, data: pd.DataFrame, all_home_stats=[], all_away_stats=[]):
         self.all_home_stats = all_home_stats
         self.all_away_stats = all_away_stats
@@ -85,5 +110,4 @@ class Process:
         )
 
         print(f"Files saved to {save_dir}!!")
-
         return
