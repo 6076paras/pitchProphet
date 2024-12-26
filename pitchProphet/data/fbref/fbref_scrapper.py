@@ -145,10 +145,15 @@ class FBRefScraper:
 
         return {"TeamStat": team_df, "PlayerStat": player_df, "GKStat": gk_df}
 
-    def _save_matches(self, matches: list, league: str, season: str) -> None:
+    def _save_matches(
+        self, matches: list, league: str, season: str, inference=False
+    ) -> None:
         """save scraped matches to json file"""
         # create output directory
-        output_path = Path(self.config["output_dir"])
+        if inference:
+            output_path = Path(self.config["output_dir"]) / "inference"
+        else:
+            output_path = Path(self.config["output_dir"])
         output_path.mkdir(parents=True, exist_ok=True)
 
         # save data
@@ -157,7 +162,7 @@ class FBRefScraper:
             json.dump(matches, f, indent=4)
         print(f"\nSaved {len(matches)} matches to {output_file}")
 
-    def scrape_season(self, season, league):
+    def scrape_season(self, season, league, inference=False):
         """scrape all matches in a season"""
         # make url
         league_id = self.config["league_ids"][league]
@@ -167,6 +172,11 @@ class FBRefScraper:
         match_links = self.get_match_links(url, league)
         total_matches = len(match_links)
         print(f"Found {total_matches} matches to scrape")
+
+        # TODO: reverse match link in all case and fix downstream
+        # for inference select last 60 matches
+        if inference == True:
+            match_links = match_links[-60:]
 
         # scrape each match
         all_matches = []
@@ -192,7 +202,7 @@ def main():
     try:
         config = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
         scraper = FBRefScraper(config)
-        scraper.scrape_season("2024-2025", "Premier-League")
+        scraper.scrape_season("2023-2024", "Premier-League")
     except Exception as e:
         print(f"Error in main process: {e}")
         raise

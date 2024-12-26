@@ -30,26 +30,34 @@ def load_config(path: str) -> dict:
         return {}
 
 
+def inference_data(config_path):
+    # scrapp
+    scrapp = FBRefScraper(config_path)
+    pass
+
+
 def main():
     config_path = (
         "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
     )
     config = load_config(config_path)
-    if not config:
-        print("Failed to load configuration.")
-        return
 
+    # get fixtures
     try:
         league = "Premier-League"
         league_id = config["scraper"]["league_ids"][league]
         url = f"{config['scraper']['base_url']}/{league_id}/2024-2025/schedule/2024-2025-{league}-Scores-and-Fixtures"
-        fixtures = get_fixtures(1, url)
+        match_week = 10
+        fixtures = get_fixtures(match_week, url)
         if not fixtures.empty:
             print(fixtures)
         else:
             print("No fixtures found.")
     except Exception as e:
         print(f"Unexpected error: {e}")
+
+    # get inference data
+    data = inference_data(config_path)
 
 
 if __name__ == "__main__":
