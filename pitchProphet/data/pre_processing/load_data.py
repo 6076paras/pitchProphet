@@ -36,6 +36,7 @@ class LoadData:
             3. Away team statistics
         """
 
+        # TODO: drop duplicate hinders synthetic copies of data
         # flatten dataset
         home_stat_df = pd.json_normalize(
             self.data, record_path="HomeStat"
@@ -74,7 +75,7 @@ class LoadData:
     def _find_relv_files(self):
         """iterate throguh raw file dir and return relevent files"""
         # TODO: more filters
-        return glob.glob(f"{self.json_dir}/*5-matches.json")
+        return glob.glob(f"{self.json_dir}/*.json")
 
     def _open_json(self, all_json: List[str]) -> dict:
         combined_data = []
