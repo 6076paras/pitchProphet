@@ -15,7 +15,7 @@ class DescriptiveStats:
             from LoadData class.
         n (int): Number of previous matches to consider to calculate
             descriptive statistics - such as mean, variance and slope.
-        inference (bool): Whether to use the class for inference or training.
+        inference (bool): Whether to use the class for inference or training data.
 
     Methods:
         process_home_away_features(row: pd.Series, inference=False) -> Dict[str, pd.Series]:
@@ -30,7 +30,7 @@ class DescriptiveStats:
         self.inference = inference
 
     def _standardize_team_name(self, team_name: str) -> str:
-        """Standardizes team names to match between fixtures and match data."""
+        """standardizes team names to match between fixtures and match data."""
         team_mapping = {
             "Newcastle Utd": "Newcastle United",
             "Nott'ham Forest": "Nottingham Forest",
@@ -40,10 +40,10 @@ class DescriptiveStats:
         return team_mapping.get(team_name, team_name)
 
     def _get_last_n_data(self, row: pd.Series) -> Dict[str, pd.DataFrame]:
-        """Retrieves last n matches' home team features and away team features.
+        """retrieves last n matches' home team features and away team features.
         For training: uses inner index from MatchInfo outer index to access home and away team's
         features for last n games before the current match.
-        For inference: gets the last n matches for teams specified in the fixtures."""
+        For inference: gets the n matches for teams specified in the fixtures."""
 
         match_info = self.data.loc["MatchInfo"]
 
