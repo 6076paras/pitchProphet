@@ -15,9 +15,7 @@ from pitchProphet.data.pre_processing.process import Process
 
 def main() -> None:
 
-    json_path = (
-        "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw"
-    )
+    json_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/team_data"
     config_path = (
         "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
     )

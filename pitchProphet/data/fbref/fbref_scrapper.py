@@ -183,8 +183,6 @@ class FBRefScraper:
             except Exception as e:
                 print(f"Error on match {i}: {e}")
                 continue
-            if i == 5:
-                break
 
         # save matches
         self._save_matches(all_matches, league, season)

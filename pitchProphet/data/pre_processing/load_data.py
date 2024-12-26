@@ -78,7 +78,6 @@ class LoadData:
 
     def _open_json(self, all_json: List[str]) -> dict:
         combined_data = []
-        print(all_json)
         for file in all_json:
             with open(file, "r") as file:
                 data = json.load(file)
