@@ -6,61 +6,94 @@ import pandas as pd
 
 class DescriptiveStats:
     """
-    Class to calculate and return descriptive statistics such as mean, varience
-    and slope for reach row (match), using last n team features
+    Class to calculate and return descriptive statistics such as mean, variance
+    and slope for each row (match), using last n team features
     for both home and away teams separately.
 
     Attributes:
         data (pd.DataFrame): DataFrame containing match data obtained
             from LoadData class.
         n (int): Number of previous matches to consider to calculate
-            descriptive statiscics - such as mean, variaence and slope.
+            descriptive statistics - such as mean, variance and slope.
+        inference (bool): Whether to use the class for inference or training.
 
     Methods:
-        process_home_away_features(row: pd.Series) -> Dict[str, pd.Series]:
+        process_home_away_features(row: pd.Series, inference=False) -> Dict[str, pd.Series]:
             Returns descriptive statistics for a match by calling
-            _calculate_statisctics() using home and away team data from
+            _calculate_statistics() using home and away team data from
             _get_last_n_data().
-
     """
 
-    def __init__(self, data: pd.DataFrame, n=5):
+    def __init__(self, data: pd.DataFrame, n=5, inference=False):
         self.data = data
         self.n = n
+        self.inference = inference
+
+    def _standardize_team_name(self, team_name: str) -> str:
+        """Standardizes team names to match between fixtures and match data."""
+        team_mapping = {
+            "Newcastle Utd": "Newcastle United",
+            "Nott'ham Forest": "Nottingham Forest",
+            "Manchester Utd": "Manchester United",
+            "Tottenham": "Tottenham Hotspur",
+        }
+        return team_mapping.get(team_name, team_name)
 
     def _get_last_n_data(self, row: pd.Series) -> Dict[str, pd.DataFrame]:
-        """retrieves last n matches' home team features and away team features.
-        it uses inner index from MatchInfo outer index to acess home and away team's
-        features for last n games."""
+        """Retrieves last n matches' home team features and away team features.
+        For training: uses inner index from MatchInfo outer index to access home and away team's
+        features for last n games before the current match.
+        For inference: gets the last n matches for teams specified in the fixtures."""
 
-        # get team names from the match info
-        home_team = row["HomeTeam"]
-        away_team = row["AwayTeam"]
-        current_idx = row.name
-
-        print(f"\nProcessing match: Home={home_team} vs Away={away_team}")
-        print(f"Current index: {current_idx}")
-
-        # get all match indices where teams played
         match_info = self.data.loc["MatchInfo"]
 
-        away_indices = match_info[
-            (
-                (match_info["HomeTeam"] == away_team)
-                | (match_info["AwayTeam"] == away_team)
-            )
-            & (match_info.index < current_idx)
-        ].index[: self.n]
+        if self.inference:
+            # For inference mode, use the team names from fixtures
+            home_team = self._standardize_team_name(row["Home"])
+            away_team = self._standardize_team_name(row["Away"])
+            current_idx = None  # No need to filter by index in inference mode
+        else:
+            # For training mode, use team names from match info
+            home_team = row["HomeTeam"]
+            away_team = row["AwayTeam"]
+            current_idx = row.name
 
-        home_indices = match_info[
-            (
+        print(f"\nProcessing match: Home={home_team} vs Away={away_team}")
+        if current_idx is not None:
+            print(f"Current index: {current_idx}")
+
+        # Get indices for matches where teams played
+        if self.inference:
+            # For inference, get the last n matches without index filtering
+            home_indices = match_info[
                 (match_info["HomeTeam"] == home_team)
                 | (match_info["AwayTeam"] == home_team)
-            )
-            & (match_info.index < current_idx)
-        ].index[: self.n]
+            ].index[: self.n]
+            away_indices = match_info[
+                (match_info["HomeTeam"] == away_team)
+                | (match_info["AwayTeam"] == away_team)
+            ].index[: self.n]
+        else:
+            # For training, get only matches before the current index
+            home_indices = match_info[
+                (
+                    (match_info["HomeTeam"] == home_team)
+                    | (match_info["AwayTeam"] == home_team)
+                )
+                & (match_info.index < current_idx)
+            ].index[: self.n]
+            away_indices = match_info[
+                (
+                    (match_info["HomeTeam"] == away_team)
+                    | (match_info["AwayTeam"] == away_team)
+                )
+                & (match_info.index < current_idx)
+            ].index[: self.n]
 
-        # get stats for home team's matches from idx of last n home matches
+        print(f"Found {len(home_indices)} matches for {home_team}")
+        print(f"Found {len(away_indices)} matches for {away_team}")
+
+        # Get stats for home team's matches
         home_data = pd.DataFrame()
         for idx in home_indices:
             match_slice = self.data.xs(idx, level=1)
@@ -70,7 +103,7 @@ class DescriptiveStats:
                 stats = match_slice.loc["AwayStat"]
             home_data = pd.concat([home_data, stats.to_frame().T])
 
-        # get stats for away team's matches from the ixs of last n away matches
+        # Get stats for away team's matches
         away_data = pd.DataFrame()
         for idx in away_indices:
             match_slice = self.data.xs(idx, level=1)
@@ -80,7 +113,7 @@ class DescriptiveStats:
                 stats = match_slice.loc["AwayStat"]
             away_data = pd.concat([away_data, stats.to_frame().T])
 
-        # drop NA columns
+        # Drop NA columns
         home_data = home_data.dropna(axis=1)
         away_data = away_data.dropna(axis=1)
 
@@ -129,7 +162,9 @@ class DescriptiveStats:
 
         return pd.Series(stats_dict)
 
-    def process_home_away_features(self, row: pd.Series) -> Dict[str, pd.DataFrame]:
+    def process_home_away_features(
+        self, row: pd.Series, inference=False
+    ) -> Dict[str, pd.Series]:
         """get descriptive statistics for a match for both home and away team"""
 
         # get last n matches data

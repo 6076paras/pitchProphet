@@ -6,6 +6,7 @@ import pandas as pd
 import yaml
 
 from pitchProphet.data.fbref.fbref_scrapper import FBRefScraper
+from pitchProphet.data.pre_processing.calculate_stats import DescriptiveStats
 from pitchProphet.data.pre_processing.load_data import LoadData
 from pitchProphet.data.pre_processing.process import Process
 
@@ -49,7 +50,7 @@ def load_data(inference_raw_pth, config_path):
 
 
 def standardize_team_name(team_name: str) -> str:
-    """Standardizes team names to match between fixtures and match data."""
+    """standardizes team names to match between fixtures and match data."""
     team_mapping = {
         "Newcastle Utd": "Newcastle United",
         "Nott'ham Forest": "Nottingham Forest",
@@ -60,61 +61,29 @@ def standardize_team_name(team_name: str) -> str:
 
 
 def add_stats(fixtures, data, n=5):
-    """Add historical stats for each team in the fixtures."""
-    # loop through each fixture
-    for index, row in fixtures.iterrows():
-        # standardize team names
-        home_team = standardize_team_name(row["Home"])
-        away_team = standardize_team_name(row["Away"])
+    """add historical stats for each team in the fixtures."""
+    # Initialize DescriptiveStats with inference mode
+    stats_calculator = DescriptiveStats(data, n=n, inference=True)
 
-        # get group of matches for each fixture
-        match_info = data.loc["MatchInfo"]
+    all_home_stats = []
+    all_away_stats = []
 
-        # get indices for home team's matches
-        home_indices = match_info[
-            (
-                (match_info["HomeTeam"] == home_team)
-                | (match_info["AwayTeam"] == home_team)
-            )
-        ].index[:n]
+    # Process each fixture
+    for _, row in fixtures.iterrows():
+        try:
+            # Calculate stats for the match
+            match_stats = stats_calculator.process_home_away_features(row)
+            all_home_stats.append(match_stats["home_stats"])
+            all_away_stats.append(match_stats["away_stats"])
+        except Exception as e:
+            print(f"Error processing fixture: {e}")
+            continue
 
-        # get indices for away team's matches
-        away_indices = match_info[
-            (
-                (match_info["HomeTeam"] == away_team)
-                | (match_info["AwayTeam"] == away_team)
-            )
-        ].index[:n]
+    # Convert lists to DataFrames
+    home_stats_df = pd.DataFrame(all_home_stats)
+    away_stats_df = pd.DataFrame(all_away_stats)
 
-        print(f"\nProcessing match: {home_team} vs {away_team}")
-        print(f"Found {len(home_indices)} matches for {home_team}")
-        print(f"Found {len(away_indices)} matches for {away_team}")
-
-        # get stats for home team's matches from idx of last n home matches
-        home_data = pd.DataFrame()
-        for idx in home_indices:
-            match_slice = data.xs(idx, level=1)
-            if match_info.loc[idx, "HomeTeam"] == home_team:
-                stats = match_slice.loc["HomeStat"]
-            else:
-                stats = match_slice.loc["AwayStat"]
-            home_data = pd.concat([home_data, stats.to_frame().T])
-
-        # get stats for away team's matches from the ixs of last n away matches
-        away_data = pd.DataFrame()
-        for idx in away_indices:
-            match_slice = data.xs(idx, level=1)
-            if match_info.loc[idx, "HomeTeam"] == away_team:
-                stats = match_slice.loc["HomeStat"]
-            else:
-                stats = match_slice.loc["AwayStat"]
-            away_data = pd.concat([away_data, stats.to_frame().T])
-
-        # drop NA columns
-        home_data = home_data.dropna(axis=1)
-        away_data = away_data.dropna(axis=1)
-
-        return {"home_data": home_data, "away_data": away_data}
+    return {"home_data": home_stats_df, "away_data": away_stats_df}
 
 
 def main():
@@ -145,7 +114,8 @@ def main():
     # pre-process inference data
     data = load_data(inference_raw_pth, config_path)
     print(data)
-    print(add_stats(fixtures, data))
+    rtn_data = add_stats(fixtures, data)
+    print(rtn_data)
 
 
 if __name__ == "__main__":
