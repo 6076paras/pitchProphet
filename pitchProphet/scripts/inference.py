@@ -8,7 +8,6 @@ import yaml
 from pitchProphet.data.fbref.fbref_scrapper import FBRefScraper
 from pitchProphet.data.pre_processing.calculate_stats import DescriptiveStats
 from pitchProphet.data.pre_processing.load_data import LoadData
-from pitchProphet.data.pre_processing.process import Process
 
 
 def get_fixtures(match_week: int, url: str) -> pd.DataFrame:
@@ -36,14 +35,16 @@ def load_config(path: str) -> dict:
 
 
 def inference_raw_data(config_path, league):
-    # scrapp
+    """scrapp last 60 matches from fbref"""
+    # TODO: scrapp for each league
     scraper = FBRefScraper(config_path)
     scraper.scrape_season("2024-2025", league, inference=True)
     return
 
 
 def load_data(inference_raw_pth, config_path):
-    # convert json game data into multi-indexed dataframe
+    """convert json game data into multi-indexed dataframe"""
+    # TODO: load data sepeately for each league
     ld_data = LoadData(inference_raw_pth, config_path)
     data = ld_data.game_data_process()
     return data
