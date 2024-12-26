@@ -48,28 +48,47 @@ def load_data(inference_raw_pth, config_path):
     return data
 
 
+def standardize_team_name(team_name: str) -> str:
+    """Standardizes team names to match between fixtures and match data."""
+    team_mapping = {
+        "Newcastle Utd": "Newcastle United",
+        "Nott'ham Forest": "Nottingham Forest",
+        "Manchester Utd": "Manchester United",
+        "Tottenham": "Tottenham Hotspur",
+    }
+    return team_mapping.get(team_name, team_name)
+
+
 def add_stats(fixtures, data, n=5):
-
-    # loop throguh each fixtrue
+    """Add historical stats for each team in the fixtures."""
+    # loop through each fixture
     for index, row in fixtures.iterrows():
+        # standardize team names
+        home_team = standardize_team_name(row["Home"])
+        away_team = standardize_team_name(row["Away"])
 
-        # TODO: add in calculate_stats.py using inference == True and this is repeted!!
         # get group of matches for each fixture
         match_info = data.loc["MatchInfo"]
-        home_team = row["Home"]
-        away_team = row["Away"]
+
+        # get indices for home team's matches
         home_indices = match_info[
             (
                 (match_info["HomeTeam"] == home_team)
                 | (match_info["AwayTeam"] == home_team)
             )
         ].index[:n]
+
+        # get indices for away team's matches
         away_indices = match_info[
             (
-                (match_info["HomeTeam"] == home_team)
-                | (match_info["AwayTeam"] == home_team)
+                (match_info["HomeTeam"] == away_team)
+                | (match_info["AwayTeam"] == away_team)
             )
         ].index[:n]
+
+        print(f"\nProcessing match: {home_team} vs {away_team}")
+        print(f"Found {len(home_indices)} matches for {home_team}")
+        print(f"Found {len(away_indices)} matches for {away_team}")
 
         # get stats for home team's matches from idx of last n home matches
         home_data = pd.DataFrame()
