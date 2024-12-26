@@ -110,8 +110,10 @@ def main():
     # get raw inference data
     inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
 
+    # TODO: scrapp data depending upon a condition
     # data = inference_raw_data(config_path, league)
 
+    # TODO: pre-process specific data and depending upoing condition
     # pre-process inference data
     data = load_data(inference_raw_pth, config_path)
     print(data)
