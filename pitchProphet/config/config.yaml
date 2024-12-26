@@ -41,5 +41,4 @@ processing:
     - PrgC
     - Succ
   out_dir: "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/pre_processing/processed"
-  y_vars:
-    - xG
+  
