@@ -46,6 +46,7 @@ class Process:
         # initialize class that calculates the statistical variables for each row based on las n rows
         calc_stats = DescriptiveStats(self.data, n=5)
 
+        # TODO: dont process the first 5 matchweeks and remove the first five matchweek from the match_info_df
         # iterate over eatch match
         for idx in self.match_info_df.index:
             try:
