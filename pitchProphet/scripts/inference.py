@@ -50,17 +50,6 @@ def load_data(inference_raw_pth, config_path):
     return data
 
 
-def standardize_team_name(team_name: str) -> str:
-    """standardizes team names to match between fixtures and match data."""
-    team_mapping = {
-        "Newcastle Utd": "Newcastle United",
-        "Nott'ham Forest": "Nottingham Forest",
-        "Manchester Utd": "Manchester United",
-        "Tottenham": "Tottenham Hotspur",
-    }
-    return team_mapping.get(team_name, team_name)
-
-
 def add_stats(fixtures, data, n=5):
     """add historical stats for each team in the fixtures."""
     # Initialize DescriptiveStats with inference mode
