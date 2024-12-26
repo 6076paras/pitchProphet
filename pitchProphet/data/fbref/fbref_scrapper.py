@@ -177,6 +177,7 @@ class FBRefScraper:
         # for inference select last 60 matches
         if inference == True:
             match_links = match_links[-60:]
+            total_matches = len(match_links)
 
         # scrape each match
         all_matches = []

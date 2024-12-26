@@ -4,6 +4,8 @@ import pandas as pd
 import yaml
 
 from pitchProphet.data.fbref.fbref_scrapper import FBRefScraper
+from pitchProphet.data.pre_processing.load_data import LoadData
+from pitchProphet.data.pre_processing.process import Process
 
 
 def get_fixtures(match_week: int, url: str) -> pd.DataFrame:
@@ -30,10 +32,11 @@ def load_config(path: str) -> dict:
         return {}
 
 
-def inference_data(config_path):
+def inference_raw_data(config_path, league):
     # scrapp
-    scrapp = FBRefScraper(config_path)
-    pass
+    scraper = FBRefScraper(config_path)
+    scraper.scrape_season("2024-2025", league, inference=True)
+    return
 
 
 def main():
@@ -56,8 +59,10 @@ def main():
     except Exception as e:
         print(f"Unexpected error: {e}")
 
-    # get inference data
-    data = inference_data(config_path)
+    # get raw inference data
+    data = inference_raw_data(config_path, league)
+
+    # process inference data
 
 
 if __name__ == "__main__":
