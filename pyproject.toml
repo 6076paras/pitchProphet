@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.scripts]
 get-data = "pitchProphet.data.fbref.fbref_scrapper:main"
 pre-process = "pitchProphet.data.pre_processing.pre_process:main" 
+inference-data = "pitchProphet.scripts.inference:main"  
 
 [tool.poetry.dependencies]
 python = "^3.13"

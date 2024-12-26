@@ -150,7 +150,7 @@ class FBRefScraper:
     ) -> None:
         """save scraped matches to json file"""
         # create output directory
-        if inference:
+        if inference == True:
             output_path = Path(self.config["output_dir"]) / "inference"
         else:
             output_path = Path(self.config["output_dir"])
@@ -196,14 +196,14 @@ class FBRefScraper:
                 continue
 
         # save matches
-        self._save_matches(all_matches, league, season)
+        self._save_matches(all_matches, league, season, inference=False)
 
 
 def main():
     try:
         config = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
         scraper = FBRefScraper(config)
-        scraper.scrape_season("2023-2024", "Premier-League")
+        scraper.scrape_season("2022-2023", "Premier-League")
     except Exception as e:
         print(f"Error in main process: {e}")
         raise
