@@ -111,7 +111,7 @@ class FBRefScraper:
             }
 
             game_data = {
-                "MatchInfo": match_info,
+                "MatchInfo": [match_info],
                 "HomeStat": home_stats["TeamStat"].to_dict("records"),
                 "AwayStat": away_stats["TeamStat"].to_dict("records"),
             }
@@ -183,6 +183,8 @@ class FBRefScraper:
             except Exception as e:
                 print(f"Error on match {i}: {e}")
                 continue
+            if i == 5:
+                break
 
         # save matches
         self._save_matches(all_matches, league, season)
@@ -192,7 +194,7 @@ def main():
     try:
         config = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
         scraper = FBRefScraper(config)
-        scraper.scrape_season("2021-2022", "Bundesliga")
+        scraper.scrape_season("2024-2025", "Premier-League")
     except Exception as e:
         print(f"Error in main process: {e}")
         raise

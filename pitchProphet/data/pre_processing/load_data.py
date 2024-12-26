@@ -74,16 +74,15 @@ class LoadData:
     def _find_relv_files(self):
         """iterate throguh raw file dir and return relevent files"""
         # TODO: more filters
-        return glob.glob(f"{self.json_dir}/*matches.json")
+        return glob.glob(f"{self.json_dir}/*5-matches.json")
 
     def _open_json(self, all_json: List[str]) -> dict:
         combined_data = []
+        print(all_json)
         for file in all_json:
             with open(file, "r") as file:
                 data = json.load(file)
                 combined_data.extend(data)
-        print(f"combined data: {len(combined_data)}")
-        print(f"all json: {all_json}")
         return combined_data
 
     def _open_yaml(self, config_path: str) -> dict:
