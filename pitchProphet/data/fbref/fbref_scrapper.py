@@ -113,7 +113,7 @@ class FBRefScraper:
             game_data = {
                 "MatchInfo": match_info,
                 "HomeStat": home_stats["TeamStat"].to_dict("records"),
-                "AwayStat": away_stats["PlayerStat"].to_dict("records"),
+                "AwayStat": away_stats["TeamStat"].to_dict("records"),
             }
             if self.player_data == True:
                 game_data["HomePlayersStat"] = (
