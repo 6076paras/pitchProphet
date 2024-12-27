@@ -76,6 +76,23 @@ def add_stats(fixtures, data, n=5):
     return {"home_data": home_stats_df, "away_data": away_stats_df}
 
 
+def process_data(data):
+    # process data for inference
+    home_stat = data["home_data"]
+    away_stat = data["away_data"]
+    if "Unnamed: 0" in home_stat.columns:
+        home_stat.drop(columns=["Unnamed: 0"], inplace=True)
+    if "Unnamed: 0" in away_stat.columns:
+        away_stat.drop(columns=["Unnamed: 0"], inplace=True)
+
+    # rename columns
+    home_stat.columns = ["h" + col for col in home_stat.columns]
+    away_stat.columns = ["a" + col for col in away_stat.columns]
+    x_df = pd.concat([home_stat, away_stat], axis=1)
+    x_df = x_df.apply(pd.to_numeric)
+    return x_df
+
+
 def main():
     config_path = (
         "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
@@ -105,9 +122,14 @@ def main():
     # TODO: pre-process specific data and depending upoing condition
     # pre-process inference data
     data = load_data(inference_raw_pth, config_path)
-    print(data)
-    rtn_data = add_stats(fixtures, data)
-    print(rtn_data)
+    inf_input = add_stats(fixtures, data)
+    print(inf_input)
+
+    # predicttion
+    processed_data = process_data(inf_input)
+
+
+# predictions = return_predict(inf_input)
 
 
 if __name__ == "__main__":
