@@ -37,18 +37,41 @@ def load_config(path: str) -> dict:
         return {}
 
 
-def inference_raw_data(config_path, league):
-    """scrapp last 80 matches from fbref"""
-    # TODO: scrapp for each league
+def check_existing_data(inference_raw_pth: str, league: str, match_week: int) -> bool:
+    """check if data for the specified league and match week exists"""
+    # TODO: add matchweek variable in the saved file name also! its accecible from match_info outer indexindex
+    # pattern = f"{inference_raw_pth}/*{league}*week_{match_week}*.json"
+    pattern = f"{inference_raw_pth}/*{league}*.json"
+    existing_files = glob.glob(pattern)
+    return len(existing_files) > 0
+
+
+def inference_raw_data(
+    config_path: str, league: str, match_week: int, force_scrape: bool = False
+) -> None:
+    """scrape last 80 matches from fbref if data doesn't exist"""
+
+    inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
+
+    # check if we need to scrape
+    if not force_scrape and check_existing_data(
+        inference_raw_pth, league, match_week=None
+    ):
+        print(f"\nFound existing data for {league} week {match_week}")
+        return
+
+    print(f"\nScraping data for {league} week {match_week}...")
     scraper = FBRefScraper(config_path)
     scraper.scrape_season("2024-2025", league, inference=True)
     return
 
 
-def load_data(inference_raw_pth, config_path):
+def load_data(inference_raw_pth, config_path, league=None, match_week=None):
     """convert json game data into multi-indexed dataframe"""
-    # TODO: load data sepeately for each league
-    ld_data = LoadData(inference_raw_pth, config_path)
+    # load data with optional league and match week filters
+    ld_data = LoadData(
+        inference_raw_pth, config_path, league=league, match_week=match_week
+    )
     data = ld_data.game_data_process()
     return data
 
@@ -127,7 +150,7 @@ def save_predictions(results: pd.DataFrame, league: str, match_week: int) -> Non
     )
     save_dir.mkdir(parents=True, exist_ok=True)
 
-    # Create filename with league and match week
+    # create filename with league and match week
     filename = f"{league}_week_{match_week}_predictions.csv"
     save_path = save_dir / filename
 
@@ -146,10 +169,10 @@ def main():
 
     # get fixtures
     try:
-        league = "Premier-League"
+        league = "Bundesliga"
         league_id = config["scraper"]["league_ids"][league]
         url = f"{config['scraper']['base_url']}/{league_id}/2024-2025/schedule/2024-2025-{league}-Scores-and-Fixtures"
-        match_week = 10
+        match_week = 16
         fixtures = get_fixtures(match_week, url)
         if not fixtures.empty:
             print("\nFixtures:")
@@ -161,15 +184,15 @@ def main():
         print(f"Unexpected error: {e}")
         return
 
-    # get raw inference data
     inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
 
-    # TODO: scrapp data depending upon a condition
-    # data = inference_raw_data(config_path, league)
+    # only scrape if data doesn't exist
+    data = inference_raw_data(config_path, league, match_week=None)
 
-    # TODO: pre-process specific data and depending upoing condition
-    # pre-process inference data
-    data = load_data(inference_raw_pth, config_path)
+    # pre-process inference data with league and match week filters
+    data = load_data(
+        inference_raw_pth, config_path, league=league, match_week=match_week
+    )
     inf_input = add_stats(fixtures, data)
 
     # get predictions

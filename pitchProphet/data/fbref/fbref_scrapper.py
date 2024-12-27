@@ -203,7 +203,7 @@ def main():
     try:
         config = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
         scraper = FBRefScraper(config)
-        scraper.scrape_season("2021-2022", "Premier-League")
+        scraper.scrape_season("2019-2020", "Premier-League")
     except Exception as e:
         print(f"Error in main process: {e}")
         raise

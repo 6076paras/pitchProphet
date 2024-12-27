@@ -19,9 +19,17 @@ class LoadData:
             Processes and returns a DataFrame of all match data.
     """
 
-    def __init__(self, json_dir: str, config_path: str):
+    def __init__(
+        self,
+        json_dir: str,
+        config_path: str,
+        league: str = None,
+        match_week: int = None,
+    ):
         self.json_dir = json_dir
         self.config_path = config_path
+        self.league = league
+        self.match_week = match_week
         self.data = self._open_json(self._find_relv_files())
         self.config = self._open_yaml(self.config_path)["processing"]
 
@@ -73,9 +81,31 @@ class LoadData:
         return home_player_df[x_vars], away_player_df[x_vars]
 
     def _find_relv_files(self):
-        """iterate throguh raw file dir and return relevent files"""
-        # TODO: more filters
-        return glob.glob(f"{self.json_dir}/*.json")
+        """iterate through raw file dir and return relevant files based on filters"""
+        pattern = f"{self.json_dir}/*.json"
+
+        # get all JSON files and retrun if no filters
+        all_files = glob.glob(pattern)
+        if not self.league and not self.match_week:
+            return all_files
+
+        # ilter files based on league and match week if specified
+        filtered_files = []
+        for file in all_files:
+            if self.league and self.league not in file:
+                continue
+            # TODO: add match-week info in file as well
+            if self.match_week not in file:
+                continue
+            filtered_files.append(file)
+
+        if not filtered_files:
+            print(
+                f"Warning: No files found matching league='{self.league}' and match_week='{self.match_week}'"
+            )
+            return all_files
+
+        return filtered_files
 
     def _open_json(self, all_json: List[str]) -> dict:
         combined_data = []
