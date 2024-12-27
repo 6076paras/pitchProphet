@@ -92,7 +92,7 @@ class LoadData:
         # ilter files based on league and match week if specified
         filtered_files = []
         for file in all_files:
-            if self.league and self.league not in file:
+            if self.league not in file:
                 continue
             # TODO: add match-week info in file as well
             if self.match_week not in file:
