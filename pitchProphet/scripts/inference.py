@@ -82,45 +82,59 @@ def add_stats(fixtures, data, n=5):
 def process_data(data: Dict[str, pd.DataFrame], model_path: str) -> pd.DataFrame:
     """process data and make predictions using the loaded model"""
 
-    try:
-        # process data for inference
-        home_stat = data["home_data"]
-        away_stat = data["away_data"]
+    # process data for inference
+    home_stat = data["home_data"]
+    away_stat = data["away_data"]
 
-        if "Unnamed: 0" in home_stat.columns:
-            home_stat.drop(columns=["Unnamed: 0"], inplace=True)
-        if "Unnamed: 0" in away_stat.columns:
-            away_stat.drop(columns=["Unnamed: 0"], inplace=True)
+    if "Unnamed: 0" in home_stat.columns:
+        home_stat.drop(columns=["Unnamed: 0"], inplace=True)
+    if "Unnamed: 0" in away_stat.columns:
+        away_stat.drop(columns=["Unnamed: 0"], inplace=True)
 
-        # rename columns
-        home_stat.columns = ["h" + col for col in home_stat.columns]
-        away_stat.columns = ["a" + col for col in away_stat.columns]
+    # rename columns
+    home_stat.columns = ["h" + col for col in home_stat.columns]
+    away_stat.columns = ["a" + col for col in away_stat.columns]
 
-        # combine features
-        x_df = pd.concat([home_stat, away_stat], axis=1)
-        x_df = x_df.apply(pd.to_numeric)
+    # combine features
+    x_df = pd.concat([home_stat, away_stat], axis=1)
+    x_df = x_df.apply(pd.to_numeric)
 
-        # load model
-        with open(model_path, "rb") as f:
-            model = pickle.load(f)
+    # load model
+    with open(model_path, "rb") as f:
+        model = pickle.load(f)
 
-        # make predictions
-        # predictions = model.predict(x_df)
-        probabilities = model.predict_proba(x_df)
+    # make predictions
+    # predictions = model.predict(x_df)
+    probabilities = model.predict_proba(x_df)
 
-        # create results DataFrame
-        results = pd.DataFrame(
-            {
-                "p(Home Win)": probabilities[:, 0],
-                "p(Draw)": probabilities[:, 1],
-                "p(Away Win)": probabilities[:, 2],
-            }
-        )
-        return results
+    # create results DataFrame
+    results = pd.DataFrame(
+        {
+            "p(Home Win)": probabilities[:, 0],
+            "p(Draw)": probabilities[:, 1],
+            "p(Away Win)": probabilities[:, 2],
+        }
+    )
+    return results
 
-    except Exception as e:
-        print(f"Error in process_data: {e}")
-        return pd.DataFrame()
+
+def save_predictions(results: pd.DataFrame, league: str, match_week: int) -> None:
+    """save prediction results to CSV file in web assets directory"""
+
+    # create directory path
+    save_dir = Path(
+        "/Users/paraspokharel/Programming/pitchProphet/web/static/assets/tables"
+    )
+    save_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create filename with league and match week
+    filename = f"{league}_week_{match_week}_predictions.csv"
+    save_path = save_dir / filename
+
+    # save to CSV
+    results.to_csv(save_path, index=False)
+    print(f"\nPredictions saved to: {save_path}")
+    return
 
 
 def main():
@@ -154,10 +168,6 @@ def main():
     # data = inference_raw_data(config_path, league)
 
     # TODO: pre-process specific data and depending upoing condition
-    # TODO: scrapp data depending upon a condition
-    # data = inference_raw_data(config_path, league)
-
-    # TODO: pre-process specific data and depending upoing condition
     # pre-process inference data
     data = load_data(inference_raw_pth, config_path)
     inf_input = add_stats(fixtures, data)
@@ -165,13 +175,13 @@ def main():
     # get predictions
     predictions = process_data(inf_input, model_path)
 
-    if not predictions.empty:
-        # combine fixtures with predictions
-        results = pd.concat([fixtures, predictions], axis=1)
-        print("\nPredictions:")
-        print(results)
-    else:
-        print("Failed to generate predictions")
+    # combine fixtures with predictions
+    results = pd.concat([fixtures, predictions], axis=1)
+    print("\nPredictions:")
+    print(results)
+
+    # save predictions to CSV
+    save_predictions(results, league, match_week)
 
 
 if __name__ == "__main__":
