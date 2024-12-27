@@ -3,54 +3,6 @@ import pandas as pd
 import pytest
 
 
-def generate_ml_out():
-    home_team_names = [
-        "Manchester United",
-        "Liverpool",
-        "Chelsea",
-        "Arsenal",
-        "Tottenham",
-        "Manchester City",
-        "Leicester City",
-        "Everton",
-        "West Ham",
-        "Aston Villa",
-    ]
-    away_team_names = [
-        "Arsenal",
-        "Chelsea",
-        "Manchester United",
-        "Liverpool",
-        "Leicester City",
-        "Tottenham",
-        "Everton",
-        "West Ham",
-        "Aston Villa",
-        "Southampton",
-    ]
-
-    np.random.seed(0)
-    home_win_prob = np.random.rand(10)
-    away_win_prob = np.random.rand(10)
-    draw_prob = 1 - home_win_prob - away_win_prob
-
-    home_win_prob = np.clip(home_win_prob, 0, 1)
-    away_win_prob = np.clip(away_win_prob, 0, 1)
-    draw_prob = np.clip(draw_prob, 0, 1)
-
-    df = pd.DataFrame(
-        {
-            "Home Team": home_team_names,
-            "Away Team": away_team_names,
-            "p(Home Team)": home_win_prob,
-            "p(Away Team)": away_win_prob,
-            "p(Draw)": draw_prob,
-        }
-    )
-
-    return df
-
-
 # Test 1: Check if the generated data has the expected number of rows and columns
 def test_shape():
     df = generate_match_data()
