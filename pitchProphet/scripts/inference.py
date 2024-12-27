@@ -38,7 +38,7 @@ def load_config(path: str) -> dict:
 
 
 def inference_raw_data(config_path, league):
-    """scrapp last 60 matches from fbref"""
+    """scrapp last 80 matches from fbref"""
     # TODO: scrapp for each league
     scraper = FBRefScraper(config_path)
     scraper.scrape_season("2024-2025", league, inference=True)
