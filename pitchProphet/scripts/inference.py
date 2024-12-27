@@ -1,7 +1,10 @@
 import glob
+import pickle
 import sys
-from typing import List
+from pathlib import Path
+from typing import Dict, List
 
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -76,27 +79,55 @@ def add_stats(fixtures, data, n=5):
     return {"home_data": home_stats_df, "away_data": away_stats_df}
 
 
-def process_data(data):
-    # process data for inference
-    home_stat = data["home_data"]
-    away_stat = data["away_data"]
-    if "Unnamed: 0" in home_stat.columns:
-        home_stat.drop(columns=["Unnamed: 0"], inplace=True)
-    if "Unnamed: 0" in away_stat.columns:
-        away_stat.drop(columns=["Unnamed: 0"], inplace=True)
+def process_data(data: Dict[str, pd.DataFrame], model_path: str) -> pd.DataFrame:
+    """process data and make predictions using the loaded model"""
 
-    # rename columns
-    home_stat.columns = ["h" + col for col in home_stat.columns]
-    away_stat.columns = ["a" + col for col in away_stat.columns]
-    x_df = pd.concat([home_stat, away_stat], axis=1)
-    x_df = x_df.apply(pd.to_numeric)
-    return x_df
+    try:
+        # process data for inference
+        home_stat = data["home_data"]
+        away_stat = data["away_data"]
+
+        if "Unnamed: 0" in home_stat.columns:
+            home_stat.drop(columns=["Unnamed: 0"], inplace=True)
+        if "Unnamed: 0" in away_stat.columns:
+            away_stat.drop(columns=["Unnamed: 0"], inplace=True)
+
+        # rename columns
+        home_stat.columns = ["h" + col for col in home_stat.columns]
+        away_stat.columns = ["a" + col for col in away_stat.columns]
+
+        # combine features
+        x_df = pd.concat([home_stat, away_stat], axis=1)
+        x_df = x_df.apply(pd.to_numeric)
+
+        # load model
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
+
+        # make predictions
+        # predictions = model.predict(x_df)
+        probabilities = model.predict_proba(x_df)
+
+        # create results DataFrame
+        results = pd.DataFrame(
+            {
+                "p(Home Win)": probabilities[:, 0],
+                "p(Draw)": probabilities[:, 1],
+                "p(Away Win)": probabilities[:, 2],
+            }
+        )
+        return results
+
+    except Exception as e:
+        print(f"Error in process_data: {e}")
+        return pd.DataFrame()
 
 
 def main():
     config_path = (
         "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
     )
+    model_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/models/xgb_model.pkl"
     config = load_config(config_path)
 
     # get fixtures
@@ -107,11 +138,14 @@ def main():
         match_week = 10
         fixtures = get_fixtures(match_week, url)
         if not fixtures.empty:
+            print("\nFixtures:")
             print(fixtures)
         else:
             print("No fixtures found.")
+            return
     except Exception as e:
         print(f"Unexpected error: {e}")
+        return
 
     # get raw inference data
     inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
@@ -120,16 +154,24 @@ def main():
     # data = inference_raw_data(config_path, league)
 
     # TODO: pre-process specific data and depending upoing condition
+    # TODO: scrapp data depending upon a condition
+    # data = inference_raw_data(config_path, league)
+
+    # TODO: pre-process specific data and depending upoing condition
     # pre-process inference data
     data = load_data(inference_raw_pth, config_path)
     inf_input = add_stats(fixtures, data)
-    print(inf_input)
 
-    # predicttion
-    processed_data = process_data(inf_input)
+    # get predictions
+    predictions = process_data(inf_input, model_path)
 
-
-# predictions = return_predict(inf_input)
+    if not predictions.empty:
+        # combine fixtures with predictions
+        results = pd.concat([fixtures, predictions], axis=1)
+        print("\nPredictions:")
+        print(results)
+    else:
+        print("Failed to generate predictions")
 
 
 if __name__ == "__main__":
