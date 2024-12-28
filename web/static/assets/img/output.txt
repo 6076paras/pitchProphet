@@ -1,0 +1,3 @@
+Built a machine learning web application to predict the outcomes of upcoming matches in Europe’s top 5 leagues, providing probabilities for match results.
+Data Collection and Processing: Scraped football match and player statistics from fbref.com using Python libraries like Beautiful Soup and pandas. Prepared and cleaned the dataset for model training.
+Web Development: Developed a user-friendly web app using Flask, HTML, and CSS to showcase machine learning predictions and model performance metrics.
