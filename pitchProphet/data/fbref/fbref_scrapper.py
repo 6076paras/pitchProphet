@@ -34,12 +34,13 @@ class FBRefScraper:
             Iterates over scrape_match for all matches in a season
     """
 
-    def __init__(self, config_path, player_data=False):
+    def __init__(self, config_path, player_data=False, inference=False):
         # load config file
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
         self.config = config["scraper"]
         self.player_data = player_data
+        self.inference = inference
 
         # setup basic logging
         logging.basicConfig(level=logging.INFO)
@@ -145,12 +146,10 @@ class FBRefScraper:
 
         return {"TeamStat": team_df, "PlayerStat": player_df, "GKStat": gk_df}
 
-    def _save_matches(
-        self, matches: list, league: str, season: str, inference=False
-    ) -> None:
+    def _save_matches(self, matches: list, league: str, season: str) -> None:
         """save scraped matches to json file"""
         # create output directory
-        if inference == True:
+        if self.inference == True:
             output_path = Path(self.config["output_dir"]) / "inference"
         else:
             output_path = Path(self.config["output_dir"])
@@ -173,9 +172,9 @@ class FBRefScraper:
         total_matches = len(match_links)
         print(f"Found {total_matches} matches to scrape")
 
-        # TODO: reverse match link in all case and fix downstream
+        # TODO: grab last n game_week data instead of last 60
         # for inference select last 60 matches
-        if inference == True:
+        if self.inference == True:
             match_links = match_links[-60:]
             total_matches = len(match_links)
 
@@ -196,7 +195,7 @@ class FBRefScraper:
                 continue
 
         # save matches
-        self._save_matches(all_matches, league, season, inference=False)
+        self._save_matches(all_matches, league, season)
 
 
 def main():
