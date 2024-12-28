@@ -84,18 +84,20 @@ class LoadData:
         """iterate through raw file dir and return relevant files based on filters"""
         pattern = f"{self.json_dir}/*.json"
 
+        str_match_week = str(self.match_week)
         # get all JSON files and retrun if no filters
         all_files = glob.glob(pattern)
-        if not self.league and not self.match_week:
+        if not self.league and not str_match_week:
             return all_files
 
         # ilter files based on league and match week if specified
         filtered_files = []
         for file in all_files:
-            if self.league not in file:
+            # check league filter if specified
+            if self.league and self.league not in file:
                 continue
-            # TODO: add match-week info in file as well
-            if self.match_week not in file:
+            # check match week filter if specified
+            if str_match_week and f"match_week-{str_match_week}" not in file:
                 continue
             filtered_files.append(file)
 
