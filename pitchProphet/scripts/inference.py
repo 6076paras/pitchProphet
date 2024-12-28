@@ -187,13 +187,14 @@ def main():
     inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
 
     # only scrape if data doesn't exist
-    data = inference_raw_data(config_path, league, match_week=None)
+    data = inference_raw_data(config_path, league, match_week=match_week - 1)
 
     # pre-process inference data with league and match week filters
     data = load_data(
         inference_raw_pth, config_path, league=league, match_week=match_week
     )
     inf_input = add_stats(fixtures, data)
+    print(inf_input)
 
     # get predictions
     predictions = process_data(inf_input, model_path)
