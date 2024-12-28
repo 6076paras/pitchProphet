@@ -39,10 +39,10 @@ def load_config(path: str) -> dict:
 
 def check_existing_data(inference_raw_pth: str, league: str, match_week: int) -> bool:
     """check if data for the specified league and match week exists"""
-    # TODO: add matchweek variable in the saved file name also! its accecible from match_info outer indexindex
-    # pattern = f"{inference_raw_pth}/*{league}*week_{match_week}*.json"
-    pattern = f"{inference_raw_pth}/*{league}*.json"
+    match_week = str(match_week)
+    pattern = f"{inference_raw_pth}/*{league}*match_week-{match_week}*.json"
     existing_files = glob.glob(pattern)
+    print(existing_files)
     return len(existing_files) > 0
 
 

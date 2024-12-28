@@ -156,10 +156,9 @@ class FBRefScraper:
         output_path.mkdir(parents=True, exist_ok=True)
 
         # find matchweek info
-        match_info_list = matches["MatchInfo"]
-        match_week = match_info_list[0].get(
-            "Matchweek", None
-        )  # Safely access Matchweek
+        last_match_dict = matches[-1]
+        match_info_dict = last_match_dict["MatchInfo"][0]
+        match_week = match_info_dict.get("Matchweek", None)
 
         # save data
         output_file = (
@@ -179,7 +178,6 @@ class FBRefScraper:
         # get all match links
         match_links = self.get_match_links(url, league)
         total_matches = len(match_links)
-        print(f"Found {total_matches} matches to scrape")
 
         # TODO: grab last n game_week data instead of last 60
         # for inference select last 60 matches
@@ -187,6 +185,7 @@ class FBRefScraper:
             match_links = match_links[-60:]
             total_matches = len(match_links)
 
+        print(f"Found {total_matches} matches to scrape")
         # scrape each match
         all_matches = []
         for i, link in enumerate(match_links, 1):
