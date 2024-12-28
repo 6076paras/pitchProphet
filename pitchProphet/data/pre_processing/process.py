@@ -100,12 +100,19 @@ class Process:
         away_rows = len(self.all_away_stats)
         match_rows = len(self.match_info_df)
 
+        # get matchweek information
+        match_week = self.match_info_df["Matchweek"].iloc[-1]
+
         # check directory and make math
         save_dir = Path(save_dir)
         save_dir.mkdir(exist_ok=True, parents=True)
 
-        self.all_home_stats.to_csv(f"{save_dir}/home_stats_{home_rows}rows.csv")
-        self.all_away_stats.to_csv(f"{save_dir}/away_stats_{away_rows}rows.csv")
+        self.all_home_stats.to_csv(
+            f"{save_dir}/home_stats_{home_rows}_matches_{match_week}_game_week.csv"
+        )
+        self.all_away_stats.to_csv(
+            f"{save_dir}/away_stats_{away_rows}_{match_week}_game_week.csv"
+        )
         self.match_info_df.to_csv(
             f"{save_dir}/match_info_with_labels_{match_rows}rows.csv"
         )
