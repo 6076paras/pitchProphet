@@ -13,3 +13,4 @@ node_modules/*
 web/static/assets/fonts/*
 !web/static/assets/table/*.csv
 !web/static/assets/img/*.jpg
+pitchProphet/scripts/date_matchweek.py
