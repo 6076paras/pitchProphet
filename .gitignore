@@ -11,3 +11,4 @@ __pycache__/
 web/node_modules/*
 web/static/assets/*
 !web/static/assets/table/*.csv
+!web/static/assets/img/*
