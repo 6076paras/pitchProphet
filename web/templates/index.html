@@ -32,10 +32,10 @@
             <div id="main-nav" class="collapse navbar-collapse">
                 <nav>
                     <ul class="nav navbar-nav">
-                        <li><a href="#Premier League">Premier League</a></li>
-                        <li><a href="#Laliga">Laliga</a></li>
-                        <li><a href="#Seria-A">Seria-A</a></li>
-                        <li><a href="#Ligue1">Ligue1</a></li>
+                        <li><a href="#Premier-League">Premier League</a></li>
+                        <li><a href="#La-Liga">La Liga</a></li>
+                        <li><a href="#Serie-A">Serie A</a></li>
+                        <li><a href="#Bundesliga">Bundesliga</a></li>
                     </ul>
                 </nav>
             </div>
@@ -48,24 +48,24 @@
             <nav>
                 <ul>
                     <li>
-                        <a href="#Premier League">
+                        <a href="#Premier-League">
                             <span class="rect"></span>
                             <span class="circle"></span>
                             Premier League
                         </a>
                     </li>
                     <li>
-                        <a href="#Laliga">
+                        <a href="#La-Liga">
                             <span class="rect"></span>
                             <span class="circle"></span>
-                            Laliga
+                            La Liga
                         </a>
                     </li>
                     <li>
-                        <a href="#Seria-A">
+                        <a href="#Serie-A">
                             <span class="rect"></span>
                             <span class="circle"></span>
-                            Seria-A
+                            Serie A
                         </a>
                     </li>
                     <li>
@@ -87,7 +87,7 @@
         </div>
 
         <div class="page-content">
-            <section id="Premier League" class="content-section">
+            <section id="Premier-League" class="content-section">
                 <div class="section-heading">
                     <h1>Premier<br><em>League</em></h1>
                     <div id="predictionTable bg-primary">
@@ -95,9 +95,9 @@
                     </div>                    
                 </div>
             </section>
-            <section id="Laliga" class="content-section">
+            <section id="La-Liga" class="content-section">
                 <div class="section-heading">
-                    <h1>Spanish<br><em>Laliga</em></h1>
+                    <h1>Spanish<br><em>La Liga</em></h1>
                     <div id="predictionTable bg-primary">
                         {{ league_data["La-Liga"]["table"] | safe }}
                     </div>                    
@@ -105,7 +105,7 @@
             </section>
             <section id="Serie-A" class="content-section">
                 <div class="section-heading">
-                    <h1>Italian<br><em>SerieA</em></h1>
+                    <h1>Italian<br><em>Serie A</em></h1>
                     <div id="predictionTable bg-primary">
                         {{ league_data["Serie-A"]["table"] | safe }}
                     </div>                    
@@ -113,7 +113,7 @@
             </section>
             <section id="Bundesliga" class="content-section">
                 <div class="section-heading">
-                    <h1>French<br><em>Bundesliga</em></h1>
+                    <h1>German<br><em>Bundesliga</em></h1>
                     <div id="predictionTable bg-primary">
                         {{ league_data["Bundesliga"]["table"] | safe }}
                     </div>                    
@@ -124,26 +124,22 @@
     <script src="{{ url_for('static', filename='js/plugins.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
-    <!-- Add smooth scrolling -->
+    <!-- add smooth scrolling -->
     <script>
-        $(document).ready(function() {
-            // Add smooth scrolling to all links
-            $("a").on('click', function(event) {
-                // Make sure this.hash has a value before overriding default behavior
-                if (this.hash !== "") {
-                    // Prevent default anchor click behavior
-                    event.preventDefault();
-
-                    // Store hash
-                    var hash = this.hash;
-
-                    // Using jQuery's animate() method to add smooth page scroll
-                    $('html, body').animate({
-                        scrollTop: $(hash).offset().top
-                    }, 800, function(){
-                        // Add hash (#) to URL when done scrolling (default click behavior)
-                        window.location.hash = hash;
+        // get all links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
                     });
+                    // update URL after scrolling
+                    window.history.pushState(null, '', targetId);
                 }
             });
         });
