@@ -169,10 +169,10 @@ def main():
 
     # get fixtures
     try:
-        league = "Bundesliga"
+        league = "La-Liga"
         league_id = config["scraper"]["league_ids"][league]
         url = f"{config['scraper']['base_url']}/{league_id}/2024-2025/schedule/2024-2025-{league}-Scores-and-Fixtures"
-        match_week = 16
+        match_week = 18
         fixtures = get_fixtures(match_week, url)
         if not fixtures.empty:
             print("\nFixtures:")

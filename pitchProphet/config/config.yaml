@@ -8,7 +8,7 @@ scraper:
   league_ids:
     Premier-League: "9"
     Bundesliga: "20"
-    "Seria-A": "11"
+    "Serie-A": "11"
     "League-1": "13"
     "La-Liga": "12"
   sleep_range: [10,15]
