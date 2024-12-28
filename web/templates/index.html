@@ -69,10 +69,10 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#League1">
+                        <a href="#Bundesliga">
                             <span class="rect"></span>
                             <span class="circle"></span>
-                            League1
+                            Bundesliga
                         </a>
                     </li>
                 </ul>
@@ -91,7 +91,7 @@
                 <div class="section-heading">
                     <h1>Premier<br><em>League</em></h1>
                     <div id="predictionTable bg-primary">
-                        {{ table | safe }}
+                        {{ league_data["Premier-League"]["table"] | safe }}
                     </div>                    
                 </div>
             </section>
@@ -99,27 +99,55 @@
                 <div class="section-heading">
                     <h1>Spanish<br><em>Laliga</em></h1>
                     <div id="predictionTable bg-primary">
-                        {{ table | safe }}
+                        {{ league_data["La-Liga"]["table"] | safe }}
                     </div>                    
                 </div>
             </section>
-            <section id="Seria-A" class="content-section">
+            <section id="Serie-A" class="content-section">
                 <div class="section-heading">
-                    <h1>Italian<br><em>SeriaA</em></h1>
+                    <h1>Italian<br><em>SerieA</em></h1>
                     <div id="predictionTable bg-primary">
-                        {{ table | safe }}
+                        {{ league_data["Serie-A"]["table"] | safe }}
                     </div>                    
                 </div>
             </section>
-            <section id="League1" class="content-section">
+            <section id="Bundesliga" class="content-section">
                 <div class="section-heading">
-                    <h1>French<br><em>League1</em></h1>
+                    <h1>French<br><em>Bundesliga</em></h1>
                     <div id="predictionTable bg-primary">
-                        {{ table | safe }}
+                        {{ league_data["Bundesliga"]["table"] | safe }}
                     </div>                    
                 </div>
             </section>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='js/vendor/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/plugins.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <!-- Add smooth scrolling -->
+    <script>
+        $(document).ready(function() {
+            // Add smooth scrolling to all links
+            $("a").on('click', function(event) {
+                // Make sure this.hash has a value before overriding default behavior
+                if (this.hash !== "") {
+                    // Prevent default anchor click behavior
+                    event.preventDefault();
+
+                    // Store hash
+                    var hash = this.hash;
+
+                    // Using jQuery's animate() method to add smooth page scroll
+                    $('html, body').animate({
+                        scrollTop: $(hash).offset().top
+                    }, 800, function(){
+                        // Add hash (#) to URL when done scrolling (default click behavior)
+                        window.location.hash = hash;
+                    });
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
