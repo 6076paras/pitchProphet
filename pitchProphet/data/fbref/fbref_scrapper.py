@@ -155,13 +155,22 @@ class FBRefScraper:
             output_path = Path(self.config["output_dir"])
         output_path.mkdir(parents=True, exist_ok=True)
 
+        # find matchweek info
+        match_info_list = matches["MatchInfo"]
+        match_week = match_info_list[0].get(
+            "Matchweek", None
+        )  # Safely access Matchweek
+
         # save data
-        output_file = output_path / f"{league}-{season}-{len(matches)}-matches.json"
+        output_file = (
+            output_path
+            / f"{league}-{season}-match_week-{match_week}-matches-{len(matches)}.json"
+        )
         with open(output_file, "w") as f:
             json.dump(matches, f, indent=4)
         print(f"\nSaved {len(matches)} matches to {output_file}")
 
-    def scrape_season(self, season, league, inference=False):
+    def scrape_season(self, season, league):
         """scrape all matches in a season"""
         # make url
         league_id = self.config["league_ids"][league]
