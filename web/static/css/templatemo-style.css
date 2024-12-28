@@ -56,13 +56,15 @@ p {
   color: #45489a;
 }
 
-.section-heading p {
-  display: inline-block;
+.section-heading .description {
+  text-align: center;  
+}
+
+.section-heading .description p {
   font-size: 15px;
   line-height: 26px;
   color: #343434;
-  position: absolute;
-  top: 12.5px;
+  margin: 0;  
 }
 
 .white-button a {
