@@ -1,0 +1,10 @@
+Home,Away,p(Home Win),p(Draw),p(Away Win)
+Dortmund,Leverkusen,0.6567444,0.079758465,0.2634971
+Mainz 05,Bochum,0.41620085,0.3182781,0.26552108
+Freiburg,Holstein Kiel,0.28518808,0.08942824,0.6253837
+Hoffenheim,Wolfsburg,0.93501097,0.019480444,0.045508582
+St. Pauli,Eint Frankfurt,0.6030051,0.07541655,0.3215783
+Heidenheim,Union Berlin,0.04266342,0.7472776,0.21005902
+Gladbach,Bayern Munich,0.14127329,0.67200136,0.18672538
+RB Leipzig,Werder Bremen,0.6446497,0.27472275,0.08062752
+Augsburg,Stuttgart,0.017412918,0.19274516,0.7898419
