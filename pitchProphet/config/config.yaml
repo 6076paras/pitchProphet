@@ -11,7 +11,7 @@ scraper:
     "Serie-A": "11"
     "League-1": "13"
     "La-Liga": "12"
-  sleep_range: [10,15]
+  sleep_range: [10, 15]
   max_retries: 3
   retry_delay: 60
   player_data: false
@@ -44,4 +44,3 @@ processing:
     - PrgC
     - Succ
   out_dir: "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/pre_processing/processed"
-  

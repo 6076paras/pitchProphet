@@ -1,8 +1,8 @@
-
 Welcome to the pitchProphet. This documentation will guide you through the setup, usage, and development of the project.
 
 # Project Status 🚧
-This project is currently under construction. Features are being added and updated regularly. 
+
+This project is currently under construction. Features are being added and updated regularly.
 
 ## Table of Contents
 
@@ -11,11 +11,10 @@ This project is currently under construction. Features are being added and updat
 3. [Installation](#installation)
 4. [Usage](#usage)
 5. [Data Processing](#data-processing)
-8. [Model Training](#model-training)
+6. [Model Training](#model-training)
 7. [Web Application](#web-application)
 8. [Testing](#testing)
 9. [Contributing](#contributing)
-
 
 ## Introduction
 
@@ -76,26 +75,29 @@ web/
 ### Steps
 
 1. Clone the repository:
-    ```sh
-    git clone https://github.com/yourusername/custom-fpl.git
-    cd custom-fpl
-    ```
+
+   ```sh
+   git clone https://github.com/yourusername/custom-fpl.git
+   cd custom-fpl
+   ```
 
 2. Install dependencies:
-    ```sh
-    poetry install
-    ```
+
+   ```sh
+   poetry install
+   ```
 
 3. Activate the virtual environment:
-    ```sh
-    poetry shell
-    ```
+   ```sh
+   poetry shell
+   ```
 
 ## Usage
 
 ### Data Scraping
 
 To scrape data from FBref, run the following script:
+
 ```sh
 get-data
 ```
@@ -103,6 +105,7 @@ get-data
 ### Data Preprocessing
 
 To preprocess the scraped data, use the [`pre_process.py`](command:_github.copilot.openRelativePath?%5B%22pitchProphet%2Fdata%2Fpre_processing%2Fpre_process.py%22%5D "pitchProphet/data/pre_processing/pre_process.py") script:
+
 ```sh
 pre-process
 ```
@@ -110,6 +113,7 @@ pre-process
 ### Model Training
 
 To train the predictive model, run the following script:
+
 ```sh
 python pitchProphet/models/train_model.py
 ```
@@ -117,18 +121,21 @@ python pitchProphet/models/train_model.py
 ### Web Application
 
 To start the web application, run:
+
 ```sh
 python web/app.py
 ```
-Then, open your browser and navigate to `http://localhost:5000`.
 
+Then, open your browser and navigate to `http://localhost:5000`.
 
 ## Testing
 
 To run the tests, use the following command:
+
 ```sh
 pytest
 ```
+
 Test files are located in the [`tests/`](command:_github.copilot.openRelativePath?%5B%22tests%2F%22%5D "tests/") directory.
 
 ## Contributing
@@ -139,9 +146,9 @@ We welcome contributions! Please follow these steps:
 2. Create a new branch (`git checkout -b feature-branch`).
 3. Make your changes.
 4. Install pre-commit hooks:
-    ```sh
-    pre-commit install
-    ```
+   ```sh
+   pre-commit install
+   ```
 5. Commit your changes (`git commit -am 'Add new feature'`).
 6. Push to the branch (`git push origin feature-branch`).
 7. Create a new Pull Request.
