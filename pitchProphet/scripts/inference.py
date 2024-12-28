@@ -61,8 +61,8 @@ def inference_raw_data(
         return
 
     print(f"\nScraping data for {league} week {match_week}...")
-    scraper = FBRefScraper(config_path)
-    scraper.scrape_season("2024-2025", league, inference=True)
+    scraper = FBRefScraper(config_path, inference=True)
+    scraper.scrape_season("2024-2025", league)
     return
 
 
@@ -78,13 +78,13 @@ def load_data(inference_raw_pth, config_path, league=None, match_week=None):
 
 def add_stats(fixtures, data, n=5):
     """add historical stats for each team in the fixtures."""
-    # Initialize DescriptiveStats with inference mode
+    # initialize DescriptiveStats with inference mode
     stats_calculator = DescriptiveStats(data, n=n, inference=True)
 
     all_home_stats = []
     all_away_stats = []
 
-    # Process each fixture
+    # process each fixture
     for _, row in fixtures.iterrows():
         try:
             # Calculate stats for the match
@@ -95,7 +95,7 @@ def add_stats(fixtures, data, n=5):
             print(f"Error processing fixture: {e}")
             continue
 
-    # Convert lists to DataFrames
+    # convert lists to DataFrames
     home_stats_df = pd.DataFrame(all_home_stats)
     away_stats_df = pd.DataFrame(all_away_stats)
 
@@ -143,7 +143,7 @@ def process_data(data: Dict[str, pd.DataFrame], model_path: str) -> pd.DataFrame
 
 def save_predictions(results: pd.DataFrame, league: str, match_week: int) -> None:
     """save prediction results to CSV file in web assets directory"""
-
+    # TODO: think about refactoring later!
     # create directory path
     save_dir = Path(
         "/Users/paraspokharel/Programming/pitchProphet/web/static/assets/tables"
