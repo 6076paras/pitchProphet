@@ -135,7 +135,10 @@ This processed data feeds directly into the web application, which displays the 
 
 ### Web Application
 
-To start the web application, run:
+The web application provides an intuitive interface to view match predictions for all major European leagues. Built with Flask, it displays prediction probabilities for upcoming fixtures in each league. You can explore the prediction results on the web application [here](http://ec2-35-170-244-111.compute-1.amazonaws.com/).
+
+#### Local Development
+To start the web application locally:
 
 ```sh
 python web/app.py
@@ -143,27 +146,34 @@ python web/app.py
 
 Then, open your browser and navigate to `http://localhost:5000`.
 
-## Testing
+### Testing
 
-To run the tests, use the following command:
+To run the tests:
 
 ```sh
 pytest
 ```
 
-Test files are located in the [`tests/`](command:_github.copilot.openRelativePath?%5B%22tests%2F%22%5D "tests/") directory.
+Test files are located in the `tests/` directory and cover:
+- Data scraping functionality
+- Pre-processing pipeline
+- Model inference
+- Web application routes
 
-## Contributing
+### Contributing
 
 We welcome contributions! Please follow these steps:
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes.
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature-branch`)
+3. Make your changes
 4. Install pre-commit hooks:
    ```sh
    pre-commit install
    ```
-5. Commit your changes (`git commit -am 'Add new feature'`).
-6. Push to the branch (`git push origin feature-branch`).
-7. Create a new Pull Request.
+5. Commit your changes (`git commit -am 'Add new feature'`)
+6. Push to the branch (`git push origin feature-branch`)
+7. Create a new Pull Request
+
+
+### Deployment
