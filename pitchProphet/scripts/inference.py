@@ -58,9 +58,7 @@ def inference_raw_data(
     inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
 
     # check if we need to scrape
-    if not force_scrape and check_existing_data(
-        inference_raw_pth, league, match_week=None
-    ):
+    if not force_scrape and check_existing_data(inference_raw_pth, league, match_week):
         print(f"\nFound existing data for {league} week {match_week}")
         return
 
