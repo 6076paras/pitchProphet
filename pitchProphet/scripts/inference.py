@@ -11,6 +11,10 @@ import yaml
 from pitchProphet.data.fbref.fbref_scrapper import FBRefScraper
 from pitchProphet.data.pre_processing.calculate_stats import DescriptiveStats
 from pitchProphet.data.pre_processing.load_data import LoadData
+from pitchProphet.utils.match_week_utils import (
+    get_current_matchweeks,
+    get_leagues_for_inference,
+)
 
 
 def get_fixtures(match_week: int, url: str) -> pd.DataFrame:
@@ -167,45 +171,60 @@ def main():
     model_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/models/xgb_model.pkl"
     config = load_config(config_path)
 
-    # get fixtures
-    try:
-        league = "La-Liga"
-        league_id = config["scraper"]["league_ids"][league]
-        url = f"{config['scraper']['base_url']}/{league_id}/2024-2025/schedule/2024-2025-{league}-Scores-and-Fixtures"
-        match_week = 18
-        fixtures = get_fixtures(match_week, url)
-        if not fixtures.empty:
-            print("\nFixtures:")
+    # get leagues that need inference-data
+    leagues_to_run = get_leagues_for_inference("2024-2025")
+
+    # process each league that needs inference
+    for league, should_run in leagues_to_run.items():
+        if not should_run:
+            print(f"\nSkipping {league} - active matches in progress")
+            continue
+
+        try:
+            print(f"\nProcessing {league}...")
+            league_id = config["scraper"]["league_ids"][league]
+            url = f"{config['scraper']['base_url']}/{league_id}/2024-2025/schedule/2024-2025-{league}-Scores-and-Fixtures"
+
+            # get current match week
+            current_weeks = get_current_matchweeks("2024-2025")
+            next_week = (
+                current_weeks[league] + 1 if current_weeks[league] is not None else 1
+            )
+
+            # get fixtures for next week
+            fixtures = get_fixtures(next_week, url)
+            if fixtures.empty:
+                print(f"No fixtures found for {league} week {next_week}")
+                continue
+
+            print(f"\nFixtures for {league} week {next_week}:")
             print(fixtures)
-        else:
-            print("No fixtures found.")
-            return
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        return
 
-    inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
+            inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
 
-    # only scrape if data doesn't exist
-    data = inference_raw_data(config_path, league, match_week=match_week - 1)
+            # only scrape if data doesn't exist
+            data = inference_raw_data(config_path, league, match_week=next_week - 1)
 
-    # pre-process inference data with league and match week filters
-    data = load_data(
-        inference_raw_pth, config_path, league=league, match_week=match_week
-    )
-    inf_input = add_stats(fixtures, data)
-    print(inf_input)
+            # pre-process inference data with league and match week filters
+            data = load_data(
+                inference_raw_pth, config_path, league=league, match_week=next_week
+            )
+            inf_input = add_stats(fixtures, data)
 
-    # get predictions
-    predictions = process_data(inf_input, model_path)
+            # get predictions
+            predictions = process_data(inf_input, model_path)
 
-    # combine fixtures with predictions
-    results = pd.concat([fixtures, predictions], axis=1)
-    print("\nPredictions:")
-    print(results)
+            # combine fixtures with predictions
+            results = pd.concat([fixtures, predictions], axis=1)
+            print(f"\nPredictions for {league}:")
+            print(results)
 
-    # save predictions to CSV
-    save_predictions(results, league, match_week)
+            # Save predictions to CSV
+            save_predictions(results, league, next_week)
+
+        except Exception as e:
+            print(f"Error processing {league}: {e}")
+            continue
 
 
 if __name__ == "__main__":
