@@ -11,12 +11,14 @@ This project is under active development, with features being added and updated 
 
 1. [Introduction](#introduction)
 2. [Installation](#installation)
-4. [Usage](#usage)
-5. [Data Processing](#data-processing)
-6. [Model Training](#model-training)
-7. [Web Application](#web-application)
-8. [Testing](#testing)
-9. [Contributing](#contributing)
+3. [Usage](#usage)
+    - [Data Scrapping](#data-scrapping)
+    - [Pre-processing](#pre-processing)
+    - [Training](#training)
+    -  
+4. [Web Application](#web-application)
+5. [Testing](#testing)
+6. [Contributing](#contributing)
 
 ## Introduction
 
@@ -73,12 +75,25 @@ scraper:
   player_data: false
 ...
 ```
-### Data Preprocessing
+### Pre-processing
 
 To preprocess the scraped data, use the [`pre_process.py`](command:_github.copilot.openRelativePath?%5B%22pitchProphet%2Fdata%2Fpre_processing%2Fpre_process.py%22%5D "pitchProphet/data/pre_processing/pre_process.py") script:
 
 ```sh
 pre-process
+```
+
+The pre-processing step transforms raw match data into features suitable for model training. For each match, the system calculates descriptive statistics (aggregation, trend, variance) of team performance metrics (e.g., goals, xG, shots) from their previous N matches. This creates a rich set of features that capture both teams' recent form and performance variability.
+
+Configuration for feature extraction can be set in the `config.yaml` under the "processing" key:
+```yaml
+processing:
+  x_vars:
+    - Gls     # Goals scored
+    - xG      # Expected goals
+    - Sh      # Shots
+    - SoT     # Shots on target
+    # ... other features
 ```
 
 ### Model Training
