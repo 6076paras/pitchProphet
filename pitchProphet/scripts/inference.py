@@ -54,17 +54,7 @@ def check_existing_data(inference_raw_pth: str, league: str, match_week: int) ->
 def inference_raw_data(
     config_path: str, league: str, match_week: int, force_scrape: bool = False
 ) -> bool:
-    """Scrape match data if it doesn't exist or if force_scrape is True.
-
-    Args:
-        config_path: Path to config file
-        league: League name
-        match_week: Match week number
-        force_scrape: If True, scrape even if data exists
-
-    Returns:
-        bool: True if data exists or was scraped successfully
-    """
+    """scrape match data if it doesn't exist or if force_scrape is True"""
     inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
 
     # If data exists and we're not forcing a scrape, use existing data
