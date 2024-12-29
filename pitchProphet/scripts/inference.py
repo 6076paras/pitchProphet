@@ -210,7 +210,7 @@ def main():
 
             # pre-process inference data
             data = load_data(
-                inference_raw_pth, config_path, league=league, match_week=next_week
+                inference_raw_pth, config_path, league=league, match_week=current_week
             )
             if data.empty:
                 print(f"No data available for {league} week {next_week}")
