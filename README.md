@@ -1,14 +1,16 @@
 Welcome to the pitchProphet. This documentation will guide you through the setup, usage, and development of the project.
 
+
 # Project Status 🚧
 
-This project is currently under construction. Features are being added and updated regularly.
+This project is under active development, with features being added and updated regularly. While predictions currently rely on team-level features, the ultimate goal of this project is to experiement and research with player-level data and advanced ML modeling that capturues the symmetry and patters of the data for more accurate predictions.
+
+
 
 ## Table of Contents
 
 1. [Introduction](#introduction)
-2. [Project Structure](#project-structure)
-3. [Installation](#installation)
+2. [Installation](#installation)
 4. [Usage](#usage)
 5. [Data Processing](#data-processing)
 6. [Model Training](#model-training)
@@ -18,58 +20,19 @@ This project is currently under construction. Features are being added and updat
 
 ## Introduction
 
-The Custom FPL project is designed to provide advanced data analysis and predictive modeling for the outcome of football matches. It includes data scraping, preprocessing, model training, and a web application.
+**PitchProphet** is a football match forecasting tool that predicts the outcome probabilities for upcoming fixtures in all major European leagues. You can explore the prediction results on the web application [here](http://ec2-35-170-244-111.compute-1.amazonaws.com/).
 
-## Project Structure
-
-```
-.gitignore
-.mypy_cache/
-.pre-commit-config.yaml
-README.md
-pitchProphet/
-    .mypy_cache/
-    __init__.py
-    __pycache__/
-    config/
-        dataVars.yaml
-    data/
-        EDA/
-        __init__.py
-        __pycache__/
-        fbref/
-        football_data_uk/
-        pre_processing/
-    models/
-        __init__.py
-        notebook/
-        xgb_model.pkl
-    scripts/
-        __init__.py
-    utils/
-poetry.lock
-pyproject.toml
-tests/
-    __init__.py
-    __pycache__/
-    test_prediction.py
-    test_scrapper.py
-web/
-    app.py
-    static/
-        assets/
-        css/
-        js/
-    templates/
-        index.html
-        index_temp.html
-```
+### Current Features
+- **Data Scraping**: Collects match-related data for teams and players from FBref.com across all major european leagues.
+- **Data Processing**: Prepares the scraped data for training ML models.
+- **Predictive Modeling**: Trains a machine learning model to predict win probabilities for upcoming matches.
+- **Web Application**: Displays the prediction results in an easy-to-use web interface.
 
 ## Installation
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.13+
 - Poetry (for dependency management)
 
 ### Steps
@@ -77,8 +40,8 @@ web/
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/yourusername/custom-fpl.git
-   cd custom-fpl
+   git clone git@github.com:6076paras/pitchProphet.git
+   cd pitchProphet
    ```
 
 2. Install dependencies:
@@ -101,7 +64,15 @@ To scrape data from FBref, run the following script:
 ```sh
 get-data
 ```
-
+The configurations for the scrapping can be set in the `config.yaml` with "scrapper" key. For example,
+```yaml
+...
+scraper:
+  season: 2017-2018
+  league: Premier-League
+  player_data: false
+...
+```
 ### Data Preprocessing
 
 To preprocess the scraped data, use the [`pre_process.py`](command:_github.copilot.openRelativePath?%5B%22pitchProphet%2Fdata%2Fpre_processing%2Fpre_process.py%22%5D "pitchProphet/data/pre_processing/pre_process.py") script:
