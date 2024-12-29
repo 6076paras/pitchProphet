@@ -2,9 +2,11 @@ from pathlib import Path
 
 import pandas as pd
 
+from pitchProphet.utils.matchweek_date import get_dates_for_gameweek
+
 
 def find_league_predictions() -> dict:
-    """find the latest prediction files for each league and their match weeks"""
+    """find the latest prediction files for each league and their match weeks and dates"""
     tables_dir = Path(
         "/Users/paraspokharel/Programming/pitchProphet/web/static/assets/tables"
     )
@@ -45,6 +47,7 @@ def get_predictions() -> dict:
     for league, info in league_files.items():
         try:
             df = pd.read_csv(info["file"])
+
             # round probabilities to 3 decimal places
             prob_columns = [col for col in df.columns if col.startswith("p(")]
             df[prob_columns] = df[prob_columns].round(3)

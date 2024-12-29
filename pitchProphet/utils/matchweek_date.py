@@ -75,9 +75,22 @@ def get_dates_for_gameweek(match_week: int) -> Dict[str, List]:
     dates = {}
     leagues = ["Bundesliga", "La-Liga", "Premier-League", "Serie-A"]
     for league in leagues:
-        match_df = df[(df["League"] == league) & (df["MatchWeek"] == match_week)]
+        match_df = df[(df["league"] == league) & (df["match_week"] == match_week)]
         dates[league] = {
-            "start_date": match_df["start_date"].dt.date.values[0],
-            "end_date": match_df["end_date"].dt.date.values[0],
+            "start_date": match_df["start_date"].dt.strftime("%Y-%m-%d").values[0],
+            "end_date": match_df["end_date"].dt.strftime("%Y-%m-%d").values[0],
         }
     return dates
+
+
+"""
+def main():
+    match_week = 1
+    result = get_dates_for_gameweek(match_week)
+    print(result)
+    return
+
+
+if __name__ == "__main__":
+    main()
+"""
