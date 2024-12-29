@@ -11,10 +11,7 @@ import yaml
 from pitchProphet.data.fbref.fbref_scrapper import FBRefScraper
 from pitchProphet.data.pre_processing.calculate_stats import DescriptiveStats
 from pitchProphet.data.pre_processing.load_data import LoadData
-from pitchProphet.utils.match_week_utils import (
-    get_current_matchweeks,
-    get_leagues_for_inference,
-)
+from pitchProphet.utils.matchweek_date import get_current_matchweek
 
 
 def get_fixtures(match_week: int, url: str) -> pd.DataFrame:
@@ -169,25 +166,23 @@ def main():
     model_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/models/xgb_model.pkl"
     config = load_config(config_path)
 
-    # get leagues that need inference-data
-    leagues_to_run = get_leagues_for_inference("2024-2025")
+    # get current match weeks for all leagues
+    current_weeks = get_current_matchweek()
 
-    # process each league that needs inference
-    for league, should_run in leagues_to_run.items():
-        if not should_run:
-            print(f"\nSkipping {league} - active matches in progress")
-            continue
-
+    # process each league
+    for league, current_week in current_weeks.items():
         try:
+            # skip if there are active matches (current_week is None)
+            if current_week is None:
+                print(f"\nSkipping {league} - active matches or no data")
+                continue
+
             print(f"\nProcessing {league}...")
             league_id = config["scraper"]["league_ids"][league]
             url = f"{config['scraper']['base_url']}/{league_id}/2024-2025/schedule/2024-2025-{league}-Scores-and-Fixtures"
 
-            # get current match week
-            current_weeks = get_current_matchweeks("2024-2025")
-            next_week = (
-                current_weeks[league] + 1 if current_weeks[league] is not None else 1
-            )
+            next_week = current_week + 1
+            print(f"Getting fixtures for week {next_week}")
 
             # get fixtures for next week
             fixtures = get_fixtures(next_week, url)
@@ -200,16 +195,15 @@ def main():
 
             inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
 
-            # only scrape if data doesn't exist
+            # scrapp if it does not exist
             data = inference_raw_data(config_path, league, match_week=next_week - 1)
 
-            # pre-process inference data with league and match week filters
+            # ore-process
             data = load_data(
                 inference_raw_pth, config_path, league=league, match_week=next_week
             )
             inf_input = add_stats(fixtures, data)
 
-            # get predictions
             predictions = process_data(inf_input, model_path)
 
             # combine fixtures with predictions
@@ -217,7 +211,7 @@ def main():
             print(f"\nPredictions for {league}:")
             print(results)
 
-            # Save predictions to CSV
+            # save
             save_predictions(results, league, next_week)
 
         except Exception as e:
