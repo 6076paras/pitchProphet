@@ -6,11 +6,12 @@ Utility function that does the following based on data/match_dates/*.csv
 """
 
 from pathlib import Path
+from typing import Dict
 
 import pandas as pd
 
 
-def get_current_matchweek():
+def get_current_matchweek() -> Dict[str, bool]:
     """get current matchweek for all leageus from date"""
     f_path = Path(
         "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/match_dates/matchweek_dates_2024_2025.csv"
@@ -53,11 +54,15 @@ def get_current_matchweek():
 
     return current_weeks
 
+
+def league_for_inference():
+    "find which leage is eligible to generate inference-date for a given time"
+
     return
 
 
 def main():
-    get_current_matchweek()
+    print(get_current_matchweek())
     return
 
 
