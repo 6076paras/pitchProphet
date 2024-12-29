@@ -43,8 +43,12 @@ def check_existing_data(inference_raw_pth: str, league: str, match_week: int) ->
     match_week = str(match_week)
     pattern = f"{inference_raw_pth}/*{league}*match_week-{match_week}*.json"
     existing_files = glob.glob(pattern)
-    print(existing_files)
-    return len(existing_files) > 0
+    if existing_files:
+        print(f"\nFound existing data file(s):")
+        for f in existing_files:
+            print(f"- {Path(f).name}")
+        return True
+    return False
 
 
 def inference_raw_data(
@@ -56,13 +60,23 @@ def inference_raw_data(
 
     # check if we need to scrape
     if not force_scrape and check_existing_data(inference_raw_pth, league, match_week):
-        print(f"\nFound existing data for {league} week {match_week}")
-        return
+        print(f"Using existing data for {league} week {match_week}")
+        return True
 
-    print(f"\nScraping data for {league} week {match_week}...")
-    scraper = FBRefScraper(config_path, inference=True)
-    scraper.scrape_season("2024-2025", league)
-    return
+    if not force_scrape:
+        print(
+            f"No existing data found for {league} week {match_week}, and force_scrape=False"
+        )
+        return False
+
+    print(f"\nScraping new data for {league} week {match_week}...")
+    try:
+        scraper = FBRefScraper(config_path, inference=True)
+        scraper.scrape_season("2024-2025", league)
+        return True
+    except Exception as e:
+        print(f"Error scraping data: {e}")
+        return False
 
 
 def load_data(inference_raw_pth, config_path, league=None, match_week=None):
@@ -195,13 +209,21 @@ def main():
 
             inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
 
-            # scrapp if it does not exist
-            data = inference_raw_data(config_path, league, match_week=next_week - 1)
+            # check for existing data, don't force scrape
+            if not inference_raw_data(
+                config_path, league, match_week=next_week - 1, force_scrape=False
+            ):
+                print(f"Skipping {league} - no data available for week {next_week - 1}")
+                continue
 
-            # ore-process
+            # pre-process inference data
             data = load_data(
                 inference_raw_pth, config_path, league=league, match_week=next_week
             )
+            if data.empty:
+                print(f"No data available for {league} week {next_week}")
+                continue
+
             inf_input = add_stats(fixtures, data)
 
             predictions = process_data(inf_input, model_path)
