@@ -12,7 +12,7 @@ import pandas as pd
 
 
 def get_current_matchweek() -> Dict[str, bool]:
-    """get current matchweek for all leageus from date"""
+    """get current matchweek for all leagues from date"""
     f_path = Path(
         "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/match_dates/matchweek_dates_2024_2025.csv"
     )
@@ -23,34 +23,31 @@ def get_current_matchweek() -> Dict[str, bool]:
 
     # find current date
     today = pd.Timestamp.now()
-    print(today)
 
+    leagues = ["Bundesliga", "La-Liga", "Premier-League", "Serie-A"]
     current_weeks = {}
-    for league in df["league"].unique():
+
+    for league in leagues:
         league_df = df[df["league"] == league]
+        if league_df.empty:
+            print(f"Warning: No data found for {league}")
+            current_weeks[league] = None
+            continue
 
         # find the match week that contains today's date
         current_week = None
         for _, row in league_df.iterrows():
             if row["start_date"] <= today <= row["end_date"]:
-                current_week = row["match_week"]
+                # active matches, return None
+                current_weeks[league] = None
                 break
-
-        # if today is before the first match week
-        if current_week is None and today < league_df["start_date"].min():
-            current_week = league_df["match_week"].min()
-
-        # if today is after the last match week
-        elif current_week is None and today > league_df["end_date"].max():
-            current_week = league_df["match_week"].max()
-
-        # if today is between match weeks, return None for this league
-        elif current_week is None:
-            current_week = None
-
-        current_weeks[league] = (
-            current_week if current_week is None else int(current_week)
-        )
+        else:
+            # no active matches, find the previous match week
+            past_weeks = league_df[league_df["end_date"] < today]
+            if not past_weeks.empty:
+                current_weeks[league] = int(past_weeks.iloc[-1]["match_week"])
+            else:
+                current_weeks[league] = None
 
     return current_weeks
 
