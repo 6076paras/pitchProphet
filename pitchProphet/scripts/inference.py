@@ -53,23 +53,27 @@ def check_existing_data(inference_raw_pth: str, league: str, match_week: int) ->
 
 def inference_raw_data(
     config_path: str, league: str, match_week: int, force_scrape: bool = False
-) -> None:
-    """scrape last 80 matches from fbref if data doesn't exist"""
+) -> bool:
+    """Scrape match data if it doesn't exist or if force_scrape is True.
 
+    Args:
+        config_path: Path to config file
+        league: League name
+        match_week: Match week number
+        force_scrape: If True, scrape even if data exists
+
+    Returns:
+        bool: True if data exists or was scraped successfully
+    """
     inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
 
-    # check if we need to scrape
+    # If data exists and we're not forcing a scrape, use existing data
     if not force_scrape and check_existing_data(inference_raw_pth, league, match_week):
         print(f"Using existing data for {league} week {match_week}")
         return True
 
-    if not force_scrape:
-        print(
-            f"No existing data found for {league} week {match_week}, and force_scrape=False"
-        )
-        return False
-
-    print(f"\nScraping new data for {league} week {match_week}...")
+    # Data doesn't exist or force_scrape=True, so scrape new data
+    print(f"\nScraping data for {league} week {match_week}...")
     try:
         scraper = FBRefScraper(config_path, inference=True)
         scraper.scrape_season("2024-2025", league)
