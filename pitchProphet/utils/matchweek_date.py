@@ -6,7 +6,7 @@ Utility functions based on data/match_dates/*.csv
 """
 
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 import pandas as pd
 
@@ -58,3 +58,26 @@ def get_leagues_for_inference() -> Dict[str, bool]:
     # for each league, True if no active matches (week is None)
     leagues = ["Bundesliga", "La-Liga", "Premier-League", "Serie-A"]
     return {league: current_weeks.get(league) is None for league in leagues}
+
+
+def get_dates_for_gameweek(match_week: int) -> Dict[str, List]:
+    "get start date and end date for a given matchweek and league"
+    # TODO: refactor/cleanup
+    f_path = Path(
+        "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/match_dates/matchweek_dates_2024_2025.csv"
+    )
+    # load data
+    df = pd.read_csv(f_path)
+    df["start_date"] = pd.to_datetime(df["start_date"])
+    df["end_date"] = pd.to_datetime(df["end_date"])
+
+    # loop throguh
+    dates = {}
+    leagues = ["Bundesliga", "La-Liga", "Premier-League", "Serie-A"]
+    for league in leagues:
+        match_df = df[(df["League"] == league) & (df["MatchWeek"] == match_week)]
+        dates[league] = {
+            "start_dates": match_df["start_date"],
+            "end_dates": match_df["end_date"],
+        }
+    return dates
