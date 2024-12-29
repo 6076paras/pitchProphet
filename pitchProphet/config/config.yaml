@@ -4,6 +4,9 @@ global:
   processed_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/pre_processing/processed
 
 scraper:
+  season: 2017-2018
+  league: Premier-League
+  player_data: false
   base_url: "https://fbref.com/en/comps"
   league_ids:
     Premier-League: "9"
@@ -14,12 +17,10 @@ scraper:
   sleep_range: [10, 15]
   max_retries: 3
   retry_delay: 60
-  player_data: false
-  season: 2017-2018
-  league: Premier-League
   output_dir: "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw"
 
 processing:
+  last_n_match: 5
   x_vars:
     - Gls
     - Ast

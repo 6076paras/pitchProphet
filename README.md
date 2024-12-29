@@ -6,7 +6,6 @@ Welcome to the pitchProphet. This documentation will guide you through the setup
 This project is under active development, with features being added and updated regularly. While predictions currently rely on team-level features, the ultimate goal of this project is to experiement and research with player-level data and advanced ML modeling that capturues the symmetry and patters of the data for more accurate predictions.
 
 
-
 ## Table of Contents
 
 1. [Introduction](#introduction)
@@ -14,8 +13,7 @@ This project is under active development, with features being added and updated 
 3. [Usage](#usage)
     - [Data Scrapping](#data-scrapping)
     - [Pre-processing](#pre-processing)
-    - [Training](#training)
-    -  
+    - [Training](#training)  
 4. [Web Application](#web-application)
 5. [Testing](#testing)
 6. [Contributing](#contributing)
@@ -83,26 +81,57 @@ To preprocess the scraped data, use the [`pre_process.py`](command:_github.copil
 pre-process
 ```
 
-The pre-processing step transforms raw match data into features suitable for model training. For each match, the system calculates descriptive statistics (aggregation, trend, variance) of team performance metrics (e.g., goals, xG, shots) from their previous N matches. This creates a rich set of features that capture both teams' recent form and performance variability.
+The pre-processing step transforms raw match data into features suitable for model training. For each match and team, the system calculates descriptive statistics (aggregation, trend, variance) of team performance metrics (e.g., goals, xG, shots) from their previous N matches. This creates a rich set of features that capture both teams' recent form and performance variability.  You can also spefify which of the features you want to pre-process from in the configuration file.
 
 Configuration for feature extraction can be set in the `config.yaml` under the "processing" key:
 ```yaml
 processing:
+  last_n_matches: 5
   x_vars:
-    - Gls     # Goals scored
-    - xG      # Expected goals
-    - Sh      # Shots
-    - SoT     # Shots on target
+    - Gls     # goals scored
+    - xG      # expected goals
+    - Sh      # shots
+    - SoT     # shots on target
     # ... other features
 ```
 
-### Model Training
+### Model Development
 
-To train the predictive model, run the following script:
+The model development process is documented in Jupyter notebooks located in the `pitchProphet/models/notebook/` directory:
 
-```sh
-python pitchProphet/models/train_model.py
+- `model_classic_1.ipynb`: Initial model development using classical machine learning approaches
+  - Data preparation and feature engineering
+  - Model training and evaluation
+  - Performance metrics and analysis with plots
+  - Model serialization (.pkl file)
+
+To run the notebooks:
+```bash
+jupyter notebook pitchProphet/models/notebook/
 ```
+### Inference Pipeline
+
+The inference pipeline automatically processes upcoming fixtures and generates predictions that is fed to the web application. This involves several steps:
+
+1. **Matchweek Detection**:
+   - The system tracks current matchweek dates for each league using a CSV file containing fixture schedules
+   - For each league, it checks if the current date falls outside the active matchweek period (between first and last game dates)
+   - Only processes leagues that aren't currently in an active matchweek
+
+2. **Feature Generation**:
+   - For each upcoming fixture:
+     - Retrieves last N matches for both home and away teams
+     - Calculates descriptive statistics (aggregation, trend, variance) for each team's performance metrics
+     - Combines home and away team features into a format suitable for model inference
+
+3. **Model Prediction**:
+   - Processes the prepared features through the trained XGBoost model
+   - Generates probability scores for three possible outcomes:
+     - Home Win
+     - Draw
+     - Away Win
+
+This processed data feeds directly into the web application, which displays the predictions for upcoming fixtures in each league.
 
 ### Web Application
 
