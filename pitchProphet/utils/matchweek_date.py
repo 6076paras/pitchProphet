@@ -77,7 +77,7 @@ def get_dates_for_gameweek(match_week: int) -> Dict[str, List]:
     for league in leagues:
         match_df = df[(df["League"] == league) & (df["MatchWeek"] == match_week)]
         dates[league] = {
-            "start_dates": match_df["start_date"],
-            "end_dates": match_df["end_date"],
+            "start_date": match_df["start_date"].dt.date.values[0],
+            "end_date": match_df["end_date"].dt.date.values[0],
         }
     return dates
