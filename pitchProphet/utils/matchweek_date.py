@@ -35,6 +35,24 @@ def get_current_matchweek():
                 current_week = row["match_week"]
                 break
 
+        # if today is before the first match week
+        if current_week is None and today < league_df["start_date"].min():
+            current_week = league_df["match_week"].min()
+
+        # if today is after the last match week
+        elif current_week is None and today > league_df["end_date"].max():
+            current_week = league_df["match_week"].max()
+
+        # if today is between match weeks, return None for this league
+        elif current_week is None:
+            current_week = None
+
+        current_weeks[league] = (
+            current_week if current_week is None else int(current_week)
+        )
+
+    return current_weeks
+
     return
 
 
