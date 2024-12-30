@@ -1,49 +1,134 @@
+# =========================================
+# Global Configuration
+# =========================================
 global:
   root_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
-  raw_Fdata: data/fbref/trial90.json
-  processed_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/pre_processing/processed
+  paths:
+    raw_data: data/fbref/trial90.json
+    processed_dir: data/pre_processing/processed
+    model_dir: models
+    inference_dir: data/fbref/raw/inference
+    logs_dir: logs
 
+# =========================================
+# Data Collection Configuration
+# =========================================
 scraper:
-  season: 2017-2018
-  league: Premier-League
-  player_data: false
+  # API endpoints and identifiers
   base_url: "https://fbref.com/en/comps"
   league_ids:
     Premier-League: "9"
     Bundesliga: "20"
-    "Serie-A": "11"
-    "League-1": "13"
-    "La-Liga": "12"
-  sleep_range: [10, 15]
-  max_retries: 3
-  retry_delay: 60
-  output_dir: "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw"
+    Serie-A: "11"
+    League-1: "13"
+    La-Liga: "12"
 
+  # scraping parameters. format for league value should
+  # be like scrapper[league_ids]'s keys. 
+  season: 2017-2018
+  player_data: false
+  league: Premier-League
+  
+  # rate limiting and retry logic
+  rate_limit:
+    sleep_range: [10, 15]  
+    max_retries: 3         
+    retry_delay: 60        
+  
+  # Output configuration
+  output:
+    dir: data/fbref/raw
+
+# =========================================
+# Data Processing Configuration
+# =========================================
 processing:
+  # feature window size
   last_n_match: 5
+
+  # statistical features to calculate
+  aggregation_methods:
+    - mean
+    - sum
+    - std
+    - trend
+
+  # variables to process
   x_vars:
-    - Gls
-    - Ast
-    - PK
-    - PKatt
-    - Sh
-    - SoT
-    - CrdY
-    - CrdR
+    # scoring metrics
+    - Gls     # Goals
+    - Ast     # Assists
+    - PK      # Penalties
+    - PKatt   # Penalty attempts
+    - xG      # Expected goals
+    - npxG    # Non-penalty xG
+    - xAG     # Expected assisted goals
+    
+    # shooting metrics
+    - Sh      # Shots
+    - SoT     # Shots on target
+    
+    # disciplinary metrics
+    - CrdY    # Yellow cards
+    - CrdR    # Red cards
+    
+    # possession metrics
     - Touches
-    - Tkl
-    - Int
-    - Blocks
-    - xG
-    - npxG
-    - xAG
-    - SCA
-    - GCA
-    - Cmp
-    - Att
-    - Cmp%
-    - PrgP
     - Carries
-    - PrgC
-    - Succ
-  out_dir: "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/pre_processing/processed"
+    - PrgC    # Progressive carries
+    - Cmp     # Passes completed
+    - Att     # Passes attempted
+    - Cmp%    # Pass completion %
+    - PrgP    # Progressive passes
+    
+    # defensive metrics
+    - Tkl     # Tackles
+    - Int     # Interceptions
+    - Blocks
+    
+    # creation metrics
+    - SCA     # Shot-creating actions
+    - GCA     # Goal-creating actions
+    - Succ    # Successful actions
+
+  # output configuration
+  output:
+    dir: data/pre_processing/processed
+
+
+# =========================================
+# Model Configuration
+# =========================================
+model:
+  xgboost_params:
+    max_depth: 6
+    learning_rate: 0.1
+    n_estimators: 100
+    objective: 'multi:softprob'
+    num_class: 3
+  
+  train_test_split:
+    test_size: 0.3
+    random_state: 42
+
+# =========================================
+# Inference Configuration
+# =========================================
+inference:
+  batch_size: 32
+  update_frequency: 6  # Hours between updates
+  prediction_threshold: 0.5
+  output:
+    dir: web/static/assets/table
+    format: csv
+
+# =========================================
+# Web Application Configuration
+# =========================================
+web:
+  port: 5000
+  debug: false
+  paths:
+    static: web/static
+    templates: web/templates
+    assets: web/static/assets

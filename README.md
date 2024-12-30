@@ -146,6 +146,8 @@ python web/app.py
 
 Then, open your browser and navigate to `http://localhost:5000`.
 
+### Deployment
+
 ### Testing
 
 To run the tests:
@@ -176,4 +178,3 @@ We welcome contributions! Please follow these steps:
 7. Create a new Pull Request
 
 
-### Deployment
