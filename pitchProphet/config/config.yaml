@@ -92,8 +92,7 @@ processing:
     - Succ    # Successful actions
 
   # output configuration
-  output:
-    dir: data/pre_processing/processed
+  output_dir: data/pre_processing/processed
 
 
 # =========================================
@@ -118,9 +117,7 @@ inference:
   batch_size: 32
   update_frequency: 6  # Hours between updates
   prediction_threshold: 0.5
-  output:
-    dir: web/static/assets/table
-    format: csv
+  output_dir: web/static/assets/table
 
 # =========================================
 # Web Application Configuration

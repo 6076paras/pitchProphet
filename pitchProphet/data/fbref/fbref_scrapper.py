@@ -180,9 +180,9 @@ class FBRefScraper:
         total_matches = len(match_links)
 
         # TODO: grab last n game_week data instead of last 60
-        # for inference select last 60 matches
+        # for inference select last 100 matches
         if self.inference == True:
-            match_links = match_links[-60:]
+            match_links = match_links[-100:]
             total_matches = len(match_links)
 
         print(f"Found {total_matches} matches to scrape")
@@ -210,7 +210,7 @@ def main():
     try:
         config = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
         scraper = FBRefScraper(config)
-        scraper.scrape_season("2017-2018", "Premier-League")
+        scraper.scrape_season("2016-2017", "Premier-League")
     except Exception as e:
         print(f"Error in main process: {e}")
         raise
