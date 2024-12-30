@@ -107,7 +107,7 @@ The model development process is documented in Jupyter notebooks located in the 
 
 To run the notebooks:
 ```bash
-jupyter notebook pitchProphet/models/notebook/
+jupyter notebook pitchProphet/models/notebook/model_classic1.ipynb
 ```
 ### Inference Pipeline
 
