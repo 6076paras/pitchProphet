@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 # error handling
 set -e
@@ -10,6 +10,6 @@ cd /Users/paraspokharel/Programming/pitchProphet
 
 mkdir -p logs
 
-poetry run python scripts/inference.py >> logs/prediction_updates.log 2>&1
+poetry run python pitchProphet/scripts/inference.py >> logs/prediction_updates.log 2>&1
 
 exit 0
