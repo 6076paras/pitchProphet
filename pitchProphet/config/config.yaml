@@ -17,14 +17,15 @@ scraper:
   # API endpoints and identifiers
   base_url: "https://fbref.com/en/comps"
   league_ids:
-    Premier-League: "9"
-    Bundesliga: "20"
-    Serie-A: "11"
-    League-1: "13"
-    La-Liga: "12"
+    Premier-League: 9
+    Bundesliga: 20
+    Serie-A: 11
+    League-1: 13
+    La-Liga: 12
 
   # scraping parameters. format for league value should
-  # be like scrapper[league_ids]'s keys. 
+  # be like scrapper[league_ids]'s keys. and the date 
+  # should be in 20XX-20XX
   season: 2017-2018
   player_data: false
   league: Premier-League
@@ -33,11 +34,10 @@ scraper:
   rate_limit:
     sleep_range: [10, 15]  
     max_retries: 3         
-    retry_delay: 60        
+    retry_delay: 600        
   
   # Output configuration
-  output:
-    dir: data/fbref/raw
+  output_dir: data/fbref/raw
 
 # =========================================
 # Data Processing Configuration
@@ -117,7 +117,7 @@ inference:
   batch_size: 32
   update_frequency: 6  # Hours between updates
   prediction_threshold: 0.5
-  output_dir: web/static/assets/table
+  output_dir: web/static/assets/tables
 
 # =========================================
 # Web Application Configuration

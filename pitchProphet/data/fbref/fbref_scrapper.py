@@ -3,6 +3,7 @@ import logging
 import os
 import random
 import re
+import sys
 import time
 from pathlib import Path
 
@@ -34,7 +35,9 @@ class FBRefScraper:
             Iterates over scrape_match for all matches in a season
     """
 
-    def __init__(self, config_path, player_data=False, inference=False):
+    def __init__(
+        self, config_path: Path, player_data: bool = False, inference: bool = False
+    ):
         # load config file
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
@@ -49,14 +52,16 @@ class FBRefScraper:
         """get all match links from the season page"""
         try:
             # handle rate limiting
-            for attempt in range(3):
+            for attempt in range(self.config["rate_limit"]["max_retries"]):
                 try:
                     response = requests.get(url)
                     response.raise_for_status()
                     break
                 except requests.exceptions.HTTPError as e:
                     if e.response.status_code == 429:  # too Many Requests
-                        wait_time = 60 * (attempt + 1)
+                        wait_time = self.config["rate_limit"]["retry_delay"] * (
+                            attempt + 1
+                        )
                         print(f"\nRate limited. Waiting {wait_time} seconds...")
                         time.sleep(wait_time)
                         continue
@@ -171,9 +176,11 @@ class FBRefScraper:
 
     def scrape_season(self, season, league):
         """scrape all matches in a season"""
+        season = self.config["season"] or "2024-2025"
+        league = self.config["league"]
         # make url
         league_id = self.config["league_ids"][league]
-        url = f"{self.config['base_url']}/{league_id}/{season}/schedule/{season}-{league}-Scores-and-Fixtures"
+        url = f"{self.config['base_url']}/{str(league_id)}/{str(season)}/schedule/{str(season)}-{league}-Scores-and-Fixtures"
 
         # get all match links
         match_links = self.get_match_links(url, league)
@@ -195,8 +202,11 @@ class FBRefScraper:
                 all_matches.append(match_data)
 
                 # wait between requests
-                sleep_time = random.uniform(*self.config["sleep_range"])
+                sleep_time = random.uniform(*self.config["rate_limit"]["sleep_range"])
                 time.sleep(sleep_time)
+
+                if i == 5:
+                    sys.exit()
 
             except Exception as e:
                 print(f"Error on match {i}: {e}")
@@ -208,9 +218,10 @@ class FBRefScraper:
 
 def main():
     try:
-        config = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
+        main_dir = Path(__file__).resolve().parent.parent.parent
+        config = main_dir / "config" / "config.yaml"
         scraper = FBRefScraper(config)
-        scraper.scrape_season("2016-2017", "Premier-League")
+        scraper.scrape_season()
     except Exception as e:
         print(f"Error in main process: {e}")
         raise

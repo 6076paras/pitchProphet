@@ -50,7 +50,11 @@ def check_existing_data(inference_raw_pth: Path, league: str, match_week: int) -
 
 
 def inference_raw_data(
-    config: dict, config_path, league: str, match_week: int, force_scrape: bool = False
+    config: dict,
+    config_path: Path,
+    league: str,
+    match_week: int,
+    force_scrape: bool = False,
 ) -> bool:
     """scrape match data if it doesn't exist or if force_scrape is True"""
     inference_raw_pth = Path(config["global"]["paths"]["inference_dir"])

@@ -58,7 +58,7 @@ class Process:
                 self.all_away_stats.append(match_stats["away_stats"])
             except Exception as e:
                 print(f"Error processing match {idx}: {str(e)}")
-            continue
+                continue
         return
 
     def final_dataframe(self) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
