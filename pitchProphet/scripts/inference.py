@@ -146,13 +146,13 @@ def process_data(data: Dict[str, pd.DataFrame], model_path: Path) -> pd.DataFram
     return results
 
 
-def save_predictions(results: pd.DataFrame, league: str, match_week: int) -> None:
+def save_predictions(
+    config: dict, results: pd.DataFrame, league: str, match_week: int
+) -> None:
     """save prediction results to CSV file in web assets directory"""
     # TODO: think about refactoring later!
     # create directory path
-    save_dir = Path(
-        "/Users/paraspokharel/Programming/pitchProphet/web/static/assets/tables"
-    )
+    save_dir = Path(config["global"]["root_dir"]) / config["inference"]["output_dir"]
     save_dir.mkdir(parents=True, exist_ok=True)
 
     # create filename with league and match week
@@ -166,9 +166,8 @@ def save_predictions(results: pd.DataFrame, league: str, match_week: int) -> Non
 
 
 def main():
-    config_path = (
-        "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
-    )
+    script_dir = Path(__file__).parent.parent
+    config_path = script_dir / "config" / "config.yaml"
     config = load_config(config_path)
 
     # get current match weeks for all leagues
@@ -226,7 +225,8 @@ def main():
             print(results)
 
             # save
-            save_predictions(results, league, next_week)
+
+            save_predictions(config, results, league, next_week)
 
         except Exception as e:
             print(f"Error processing {league}: {e}")
