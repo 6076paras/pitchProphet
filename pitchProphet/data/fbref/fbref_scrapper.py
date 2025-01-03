@@ -154,8 +154,9 @@ class FBRefScraper:
     def _save_matches(self, matches: list, league: str, season: str) -> None:
         """save scraped matches to json file"""
         # create output directory
+        root_dir = Path(__file__).resolve().parent.parent.parent
         if self.inference == True:
-            output_path = Path(self.config["output_dir"]) / "inference"
+            output_path = root_dir / Path(self.config["output_dir"]) / "inference"
         else:
             output_path = Path(self.config["output_dir"])
         output_path.mkdir(parents=True, exist_ok=True)
@@ -176,8 +177,9 @@ class FBRefScraper:
 
     def scrape_season(self, season, league):
         """scrape all matches in a season"""
-        season = self.config["season"] or "2024-2025"
-        league = self.config["league"]
+        if self.inference == False:
+            season = self.config["season"] or "2024-2025"
+            league = self.config["league"]
         # make url
         league_id = self.config["league_ids"][league]
         url = f"{self.config['base_url']}/{str(league_id)}/{str(season)}/schedule/{str(season)}-{league}-Scores-and-Fixtures"
@@ -189,7 +191,7 @@ class FBRefScraper:
         # TODO: grab last n game_week data instead of last 60
         # for inference select last 100 matches
         if self.inference == True:
-            match_links = match_links[-100:]
+            match_links = match_links[-10:]
             total_matches = len(match_links)
 
         print(f"Found {total_matches} matches to scrape")
@@ -204,9 +206,6 @@ class FBRefScraper:
                 # wait between requests
                 sleep_time = random.uniform(*self.config["rate_limit"]["sleep_range"])
                 time.sleep(sleep_time)
-
-                if i == 5:
-                    sys.exit()
 
             except Exception as e:
                 print(f"Error on match {i}: {e}")
