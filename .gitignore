@@ -16,3 +16,4 @@ web/static/assets/fonts/*
 pitchProphet/scripts/date_matchweek.py
 pitchProphet/utils/match_week_utils.py
 !pitchProphet/pitchProphet/data/match_dates/*.csv
+logs/*

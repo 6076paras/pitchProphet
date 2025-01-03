@@ -107,7 +107,7 @@ def add_stats(fixtures, data, n=5):
     return {"home_data": home_stats_df, "away_data": away_stats_df}
 
 
-def process_data(data: Dict[str, pd.DataFrame], model_path: str) -> pd.DataFrame:
+def process_data(data: Dict[str, pd.DataFrame], model_path: Path) -> pd.DataFrame:
     """process data and make predictions using the loaded model"""
 
     # process data for inference
@@ -169,7 +169,6 @@ def main():
     config_path = (
         "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
     )
-    model_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/models/xgb_model.pkl"
     config = load_config(config_path)
 
     # get current match weeks for all leagues
@@ -218,6 +217,7 @@ def main():
 
             inf_input = add_stats(fixtures, data)
 
+            model_path = Path(config["global"]["paths"]["model_dir"]) / "xgb_model.pkl"
             predictions = process_data(inf_input, model_path)
 
             # combine fixtures with predictions
