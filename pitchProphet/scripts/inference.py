@@ -36,10 +36,10 @@ def load_config(path: str) -> dict:
         return {}
 
 
-def check_existing_data(inference_raw_pth: str, league: str, match_week: int) -> bool:
+def check_existing_data(inference_raw_pth: Path, league: str, match_week: int) -> bool:
     """check if data for the specified league and match week exists"""
     match_week = str(match_week)
-    pattern = f"{inference_raw_pth}/*{league}*match_week-{match_week}*.json"
+    pattern = f"{str(inference_raw_pth)}/*{league}*match_week-{match_week}*.json"
     existing_files = glob.glob(pattern)
     if existing_files:
         print(f"\nFound existing data file(s):")
@@ -50,17 +50,16 @@ def check_existing_data(inference_raw_pth: str, league: str, match_week: int) ->
 
 
 def inference_raw_data(
-    config_path: str, league: str, match_week: int, force_scrape: bool = False
+    config: dict, config_path, league: str, match_week: int, force_scrape: bool = False
 ) -> bool:
     """scrape match data if it doesn't exist or if force_scrape is True"""
-    inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
-
-    # If data exists and we're not forcing a scrape, use existing data
+    inference_raw_pth = Path(config["global"]["paths"]["inference_dir"])
+    # if data exists and we're not forcing a scrape, use existing data
     if not force_scrape and check_existing_data(inference_raw_pth, league, match_week):
         print(f"Using existing data for {league} week {match_week}")
         return True
 
-    # Data doesn't exist or force_scrape=True, so scrape new data
+    # data doesn't exist or force_scrape=True, so scrape new data
     print(f"\nScraping data for {league} week {match_week}...")
     try:
         scraper = FBRefScraper(config_path, inference=True)
@@ -74,6 +73,7 @@ def inference_raw_data(
 def load_data(inference_raw_pth, config_path, league=None, match_week=None):
     """convert json game data into multi-indexed dataframe"""
     # load data with optional league and match week filters
+    inference_raw_pth = str(inference_raw_pth)
     ld_data = LoadData(
         inference_raw_pth, config_path, league=league, match_week=match_week
     )
@@ -197,16 +197,19 @@ def main():
             print(f"\nFixtures for {league} week {next_week}:")
             print(fixtures)
 
-            inference_raw_pth = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/inference"
-
             # check for existing data, don't force scrape
             if not inference_raw_data(
-                config_path, league, match_week=next_week - 1, force_scrape=False
+                config,
+                config_path,
+                league,
+                match_week=next_week - 1,
+                force_scrape=False,
             ):
                 print(f"Skipping {league} - no data available for week {next_week - 1}")
                 continue
 
             # pre-process inference data
+            inference_raw_pth = Path(config["global"]["paths"]["inference_dir"])
             data = load_data(
                 inference_raw_pth, config_path, league=league, match_week=current_week
             )
