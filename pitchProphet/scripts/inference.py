@@ -1,5 +1,6 @@
 import glob
 import pickle
+import sys
 from pathlib import Path
 from typing import Dict, List
 
@@ -38,6 +39,7 @@ def load_config(path: str) -> dict:
 
 def check_existing_data(inference_raw_pth: Path, league: str, match_week: int) -> bool:
     """check if data for the specified league and match week exists"""
+    print(inference_raw_pth)
     match_week = str(match_week)
     pattern = f"{str(inference_raw_pth)}/*{league}*match_week-{match_week}*.json"
     existing_files = glob.glob(pattern)
@@ -176,7 +178,6 @@ def main():
 
     # get current match weeks for all leagues
     current_weeks = get_current_matchweek()
-
     # process each league
     for league, current_week in current_weeks.items():
         try:
@@ -223,7 +224,11 @@ def main():
 
             inf_input = add_stats(fixtures, data)
 
-            model_path = Path(config["global"]["paths"]["model_dir"]) / "xgb_model.pkl"
+            model_path = (
+                Path(config["global"]["root_dir"])
+                / config["global"]["paths"]["model_dir"]
+                / "xgb_model.pkl"
+            )
             predictions = process_data(inf_input, model_path)
 
             # combine fixtures with predictions
