@@ -212,7 +212,7 @@ def main():
                 print(f"Skipping {league} - no data available for week {next_week - 1}")
                 continue
 
-            # pre-process inference data
+            # pre-process inference raw data
             inference_raw_pth = Path(config["global"]["paths"]["inference_dir"])
             data = load_data(
                 inference_raw_pth, config_path, league=league, match_week=current_week

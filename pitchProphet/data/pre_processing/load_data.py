@@ -100,12 +100,14 @@ class LoadData:
             if str_match_week and f"match_week-{str_match_week}" not in file:
                 continue
             filtered_files.append(file)
+        if not self.league and not str_match_week:
+            return all_files
 
         if not filtered_files:
             print(
                 f"Warning: No files found matching league='{self.league}' and match_week='{self.match_week}'"
             )
-            return all_files
+            return []
 
         return filtered_files
 
