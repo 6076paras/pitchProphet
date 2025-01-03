@@ -137,6 +137,10 @@ def process_data(data: Dict[str, pd.DataFrame], model_path: Path) -> pd.DataFram
     with open(model_path, "rb") as f:
         model = pickle.load(f)
 
+    # re-order the input according to model's expectation
+    model_features = model.get_booster().feature_names
+    x_df = x_df[model_features]
+
     # make predictions
     # predictions = model.predict(x_df)
     probabilities = model.predict_proba(x_df)
