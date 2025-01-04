@@ -13,9 +13,9 @@ import pandas as pd
 
 def get_current_matchweek() -> Dict[str, bool]:
     """get current matchweek for all leagues from match_dates/*.csv"""
-    f_path = Path(
-        "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/match_dates/matchweek_dates_2024_2025.csv"
-    )
+    main_dir = Path(__file__).resolve().parent.parent
+    f_path = main_dir / Path("data/match_dates/matchweek_dates_2024_2025.csv")
+
     # load data
     df = pd.read_csv(f_path)
     df["start_date"] = pd.to_datetime(df["start_date"])
