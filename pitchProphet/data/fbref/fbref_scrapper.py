@@ -192,7 +192,7 @@ class FBRefScraper:
         # TODO: grab last n game_week data instead of last 60
         # for inference select last 100 matches
         if self.inference == True:
-            match_links = match_links[-10:]
+            match_links = match_links[-100:]
             total_matches = len(match_links)
 
         print(f"Found {total_matches} matches to scrape")
