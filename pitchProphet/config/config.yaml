@@ -3,11 +3,12 @@
 # =========================================
 global:
   root_dir: /Users/paraspokharel/Programming/pitchProphet
-  root_src_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
-  src_paths:
-    processed_dir: data/pre_processing/processed
-    model_dir: models
-    inference_dir: data/fbref/raw/inference
+  paths:
+    processed_dir: pitchProphet/data/pre_processing/processed  # processed data
+    raw_dir: pitchProphet/data/fbref/raw # raw scrapped data
+    model_dir: pitchProphet/models
+    inference_dir: pitchProphet/data/fbref/raw/inference # raw data for inference
+    inference_out_dir: web/static/assets/tables # probability data from inference
     logs_dir: logs
 
 # =========================================
@@ -35,9 +36,6 @@ scraper:
     sleep_range: [10, 15]  
     max_retries: 3         
     retry_delay: 600        
-  
-  # Output configuration
-  output_dir: data/fbref/raw
 
 # =========================================
 # Data Processing Configuration
@@ -47,6 +45,7 @@ processing:
   last_n_match: 5
 
   # statistical features to calculate
+  # TODO: make this configurable in the code
   aggregation_methods:
     - mean
     - sum
@@ -91,13 +90,10 @@ processing:
     - GCA     # Goal-creating actions
     - Succ    # Successful actions
 
-  # output configuration
-  output_dir: data/pre_processing/processed
-
-
 # =========================================
 # Model Configuration
 # =========================================
+# TODO: make this configurable in the code
 model:
   xgboost_params:
     max_depth: 6
@@ -117,7 +113,6 @@ inference:
   batch_size: 32
   update_frequency: 6  # Hours between updates
   prediction_threshold: 0.5
-  output_dir: web/static/assets/tables
 
 # =========================================
 # Web Application Configuration
