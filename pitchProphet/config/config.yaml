@@ -99,7 +99,7 @@ model:
 # Inference Configuration
 # =========================================
 inference:
-  force_scrape: True # Scrape even if existing data exists
+  force_scrape: False # Scrape even if existing data exists
   last_n_match: 5 # Use data from last n matches 
   batch_size: 32
   update_frequency: 6   # Hours between updates

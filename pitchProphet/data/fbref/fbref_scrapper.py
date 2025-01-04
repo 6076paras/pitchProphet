@@ -176,7 +176,7 @@ class FBRefScraper:
             json.dump(matches, f, indent=4)
         print(f"\nSaved {len(matches)} matches to {output_file}")
 
-    def scrape_season(self):
+    def scrape_season(self, league=None, season=2024 - 2025):
         """scrape all matches in a season"""
         if self.inference == False:
             season = self.config["season"] or "2024-2025"
