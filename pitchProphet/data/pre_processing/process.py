@@ -32,11 +32,14 @@ class Process:
             Saves processed DataFrames to CSV files in the specified directory.
     """
 
-    def __init__(self, data: pd.DataFrame, all_home_stats=[], all_away_stats=[]):
+    def __init__(
+        self, config: dict, data: pd.DataFrame, all_home_stats=[], all_away_stats=[]
+    ):
         self.all_home_stats = all_home_stats
         self.all_away_stats = all_away_stats
         self.data = data
         self.match_info_df = self._get_match_info()
+        self.config = config
 
     def _get_match_info(self) -> pd.DataFrame:
         return self.data.loc["MatchInfo"]
@@ -44,7 +47,8 @@ class Process:
     def process_all_match(self):
         """process each match one by one"""
         # initialize class that calculates the statistical variables for each row based on las n rows
-        calc_stats = DescriptiveStats(self.data, n=5)
+        last_n_match = self.config["processing"]["last_n_match"]
+        calc_stats = DescriptiveStats(self.data, last_n_match)
 
         # TODO: dont process the first 5 matchweeks and remove the first five matchweek from the match_info_df
         # iterate over eatch match
@@ -93,7 +97,7 @@ class Process:
         print("\nIndices verification passed: All DataFrames have matching indices")
         return
 
-    def save_file(self, inference: bool, paths):
+    def save_file(self, paths):
         """save the processed dataframes with row counts in filenames"""
 
         home_rows = len(self.all_home_stats)
@@ -105,8 +109,6 @@ class Process:
 
         # check directory and make math
         save_dir = Path(paths["root_dir"]) / Path(paths["processed_dir"])
-        if inference == True:
-            save_dir = Path(paths["root_dir"]) / Path(paths["inf_out_dir"])
 
         save_dir.mkdir(exist_ok=True, parents=True)
 

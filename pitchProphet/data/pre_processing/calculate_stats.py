@@ -24,9 +24,9 @@ class DescriptiveStats:
             _get_last_n_data().
     """
 
-    def __init__(self, data: pd.DataFrame, n=5, inference=False):
+    def __init__(self, data: pd.DataFrame, last_n_match=5, inference=False):
         self.data = data
-        self.n = n
+        self.last_n_match = last_n_match
         self.inference = inference
 
     def _standardize_team_name(self, team_name: str) -> str:
@@ -68,11 +68,11 @@ class DescriptiveStats:
             home_indices = match_info[
                 (match_info["HomeTeam"] == home_team)
                 | (match_info["AwayTeam"] == home_team)
-            ].index[: self.n]
+            ].index[: self.last_n_match_last_match]
             away_indices = match_info[
                 (match_info["HomeTeam"] == away_team)
                 | (match_info["AwayTeam"] == away_team)
-            ].index[: self.n]
+            ].index[: self.last_n_match]
         else:
             # For training, get only matches before the current index
             home_indices = match_info[
@@ -81,14 +81,14 @@ class DescriptiveStats:
                     | (match_info["AwayTeam"] == home_team)
                 )
                 & (match_info.index < current_idx)
-            ].index[: self.n]
+            ].index[: self.last_n_match]
             away_indices = match_info[
                 (
                     (match_info["HomeTeam"] == away_team)
                     | (match_info["AwayTeam"] == away_team)
                 )
                 & (match_info.index < current_idx)
-            ].index[: self.n]
+            ].index[: self.last_n_match_last_match]
 
         print(f"Found {len(home_indices)} matches for {home_team}")
         print(f"Found {len(away_indices)} matches for {away_team}")

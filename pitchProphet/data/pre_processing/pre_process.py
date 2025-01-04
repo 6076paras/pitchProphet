@@ -23,18 +23,18 @@ def main() -> None:
     # convert json game data into multi-indexed dataframe
     ld_data = LoadData(config_path)
     data = ld_data.game_data_process()
+    config = ld_data.all_config
 
     # calculate descriptive stats  for all matches
-    process_games = Process(data)
+    process_games = Process(config, data)
     process_games.process_all_match()
 
     # save processed data into 2 separate files
     # one with general game information for y label and other 2 home home and
     # away teams descriptive statiscs for all features to be used as x variable for training
     process_games.final_dataframe()
-    inference = ld_data.inference
     paths = ld_data.paths
-    process_games.save_file(inference, paths)
+    process_games.save_file(paths)
 
 
 if __name__ == "__main__":
