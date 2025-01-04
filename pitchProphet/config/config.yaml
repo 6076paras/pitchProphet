@@ -2,9 +2,9 @@
 # Global Configuration
 # =========================================
 global:
-  root_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
-
-  paths:
+  root_dir: /Users/paraspokharel/Programming/pitchProphet
+  root_src_dir: /Users/paraspokharel/Programming/pitchProphet/pitchProphet
+  src_paths:
     processed_dir: data/pre_processing/processed
     model_dir: models
     inference_dir: data/fbref/raw/inference

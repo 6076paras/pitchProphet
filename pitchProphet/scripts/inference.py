@@ -59,7 +59,7 @@ def inference_raw_data(
     force_scrape: bool = False,
 ) -> bool:
     """scrape match data if it doesn't exist or if force_scrape is True"""
-    inference_raw_pth = Path(config["global"]["paths"]["inference_dir"])
+    inference_raw_pth = Path(config["global"]["src_paths"]["inference_dir"])
     # if data exists and we're not forcing a scrape, use existing data
     if not force_scrape and check_existing_data(inference_raw_pth, league, match_week):
         print(f"Using existing data for {league} week {match_week}")
@@ -162,7 +162,9 @@ def save_predictions(
     """save prediction results to CSV file in web assets directory"""
     # TODO: think about refactoring later!
     # create directory path
-    save_dir = Path(config["global"]["root_dir"]) / config["inference"]["output_dir"]
+    save_dir = (
+        Path(config["global"]["root_src_dir"]) / config["inference"]["output_dir"]
+    )
     save_dir.mkdir(parents=True, exist_ok=True)
 
     # create filename with league and match week
@@ -218,7 +220,7 @@ def main():
                 continue
 
             # pre-process inference raw data
-            inference_raw_pth = Path(config["global"]["paths"]["inference_dir"])
+            inference_raw_pth = Path(config["global"]["src_paths"]["inference_dir"])
             data = load_data(
                 inference_raw_pth, config_path, league=league, match_week=current_week
             )
@@ -229,8 +231,8 @@ def main():
             inf_input = add_stats(fixtures, data)
 
             model_path = (
-                Path(config["global"]["root_dir"])
-                / config["global"]["paths"]["model_dir"]
+                Path(config["global"]["root_src_dir"])
+                / config["global"]["src_paths"]["model_dir"]
                 / "xgb_model.pkl"
             )
             predictions = process_data(inf_input, model_path)

@@ -154,9 +154,9 @@ class FBRefScraper:
     def _save_matches(self, matches: list, league: str, season: str) -> None:
         """save scraped matches to json file"""
         # create output directory
-        root_dir = Path(__file__).resolve().parent.parent.parent
+        root_src_dir = Path(__file__).resolve().parent.parent.parent
         if self.inference == True:
-            output_path = root_dir / Path(self.config["output_dir"]) / "inference"
+            output_path = root_src_dir / Path(self.config["output_dir"]) / "inference"
         else:
             output_path = Path(self.config["output_dir"])
         output_path.mkdir(parents=True, exist_ok=True)
