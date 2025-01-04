@@ -78,7 +78,7 @@ def load_data(config_path, league=None, match_week=None):
 def add_stats(fixtures, data, config: dict):
     """add historical stats for each team in the fixtures."""
     # initialize DescriptiveStats with inference mode
-    last_n_match = config["infernce"]["last_n_match"]
+    last_n_match = config["inference"]["last_n_match"]
     stats_calculator = DescriptiveStats(data, last_n_match, inference=True)
 
     all_home_stats = []
@@ -151,9 +151,8 @@ def save_predictions(
     """save prediction results to CSV file in web assets directory"""
     # TODO: think about refactoring later!
     # create directory path
-    save_dir = (
-        Path(config["global"]["root_src_dir"]) / config["inference"]["output_dir"]
-    )
+    paths = config["global"]["paths"]
+    save_dir = Path(paths["root_dir"]) / Path(paths["inf_out_dir"])
     save_dir.mkdir(parents=True, exist_ok=True)
 
     # create filename with league and match week
@@ -199,7 +198,7 @@ def main():
             print(fixtures)
 
             # if data exists or if force scrap is false, use existing data
-            inf_raw_dir = Path(paths["root_dir"]) / Path(paths[inf_raw_dir])
+            inf_raw_dir = Path(paths["root_dir"]) / Path(paths["inf_raw_dir"])
             force_scrape = config["inference"]["force_scrape"]
             if not force_scrape and check_existing_data(
                 inf_raw_dir, league, current_week

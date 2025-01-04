@@ -13,7 +13,7 @@ class DescriptiveStats:
     Attributes:
         data (pd.DataFrame): DataFrame containing match data obtained
             from LoadData class.
-        n (int): Number of previous matches to consider to calculate
+        last_n_match (int): Number of previous matches to consider to calculate
             descriptive statistics - such as mean, variance and slope.
         inference (bool): Whether to use the class for inference or training data.
 
@@ -68,7 +68,7 @@ class DescriptiveStats:
             home_indices = match_info[
                 (match_info["HomeTeam"] == home_team)
                 | (match_info["AwayTeam"] == home_team)
-            ].index[: self.last_n_match_last_match]
+            ].index[: self.last_n_match]
             away_indices = match_info[
                 (match_info["HomeTeam"] == away_team)
                 | (match_info["AwayTeam"] == away_team)
@@ -88,7 +88,7 @@ class DescriptiveStats:
                     | (match_info["AwayTeam"] == away_team)
                 )
                 & (match_info.index < current_idx)
-            ].index[: self.last_n_match_last_match]
+            ].index[: self.last_n_match]
 
         print(f"Found {len(home_indices)} matches for {home_team}")
         print(f"Found {len(away_indices)} matches for {away_team}")
@@ -162,9 +162,7 @@ class DescriptiveStats:
 
         return pd.Series(stats_dict)
 
-    def process_home_away_features(
-        self, row: pd.Series, inference=False
-    ) -> Dict[str, pd.Series]:
+    def process_home_away_features(self, row: pd.Series) -> Dict[str, pd.Series]:
         """get descriptive statistics for a match for both home and away team"""
 
         # get last n matches data
