@@ -1,0 +1,11 @@
+Home,Away,p(Home Win),p(Draw),p(Away Win)
+Leicester City,Manchester City,0.4317856,0.2739903,0.29422405
+Tottenham,Wolves,0.40244249,0.035490282,0.5620672
+Fulham,Bournemouth,0.21861163,0.2889033,0.49248505
+Everton,Nott'ham Forest,0.18729417,0.2080105,0.6046953
+Crystal Palace,Southampton,0.38815308,0.21658008,0.39526686
+West Ham,Liverpool,0.020121446,0.053328898,0.9265497
+Aston Villa,Brighton,0.9096027,0.017948877,0.07244847
+Ipswich Town,Chelsea,0.05535041,0.08576043,0.85888916
+Manchester Utd,Newcastle Utd,0.28806165,0.19958095,0.51235735
+Brentford,Arsenal,0.6260337,0.06345221,0.31051403
