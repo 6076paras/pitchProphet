@@ -26,7 +26,7 @@ class LoadData:
         league: str = None,
         match_week: int = None,
         player_data: bool = False,
-        inference: bool = True,
+        inference: bool = False,
     ):
         self.config_path = config_path
         self.league = league
@@ -102,8 +102,8 @@ class LoadData:
     def _find_relv_files(self):
         """iterate through raw file dir and return relevant files based on filters"""
         pattern = f"{self.raw_dir}/*.json"
+        str_match_week = str(self.match_week) if self.match_week is not None else None
 
-        str_match_week = str(self.match_week)
         # get all JSON files and retrun if no filters
         all_files = glob.glob(pattern)
         if not self.league and not str_match_week:
@@ -127,6 +127,7 @@ class LoadData:
                 f"Warning: No files found matching league='{self.league}' and match_week='{self.match_week}'"
             )
             return []
+        print(filtered_files)
 
         return filtered_files
 
