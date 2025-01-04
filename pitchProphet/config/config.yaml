@@ -2,13 +2,13 @@
 # Global Configuration
 # =========================================
 global:
-  root_dir: /Users/paraspokharel/Programming/pitchProphet
   paths:
+    root_dir: /Users/paraspokharel/Programming/pitchProphet
     processed_dir: pitchProphet/data/pre_processing/processed  # processed data
     raw_dir: pitchProphet/data/fbref/raw # raw scrapped data
     model_dir: pitchProphet/models
-    inference_dir: pitchProphet/data/fbref/raw/inference # raw data for inference
-    inference_out_dir: web/static/assets/tables # probability data from inference
+    inf_raw_dir: pitchProphet/data/fbref/raw/inference # raw data for inference
+    inf_out_dir: web/static/assets/tables # probability data from inference
     logs_dir: logs
 
 # =========================================

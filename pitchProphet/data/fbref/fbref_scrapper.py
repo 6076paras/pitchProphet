@@ -41,6 +41,7 @@ class FBRefScraper:
         # load config file
         with open(config_path, "r") as f:
             config = yaml.safe_load(f)
+        self.g_config = config["global"]
         self.config = config["scraper"]
         self.player_data = player_data
         self.inference = inference
@@ -154,11 +155,11 @@ class FBRefScraper:
     def _save_matches(self, matches: list, league: str, season: str) -> None:
         """save scraped matches to json file"""
         # create output directory
-        root_src_dir = Path(__file__).resolve().parent.parent.parent
+        paths = self.g_config["paths"]
         if self.inference == True:
-            output_path = root_src_dir / Path(self.config["output_dir"]) / "inference"
+            output_path = Path(paths["root_dir"]) / Path(paths["inf_raw_dir"])
         else:
-            output_path = Path(self.config["output_dir"])
+            output_path = Path(paths["root_dir"]) / Path(paths["raw_dir"])
         output_path.mkdir(parents=True, exist_ok=True)
 
         # find matchweek info
@@ -175,7 +176,7 @@ class FBRefScraper:
             json.dump(matches, f, indent=4)
         print(f"\nSaved {len(matches)} matches to {output_file}")
 
-    def scrape_season(self, season, league):
+    def scrape_season(self):
         """scrape all matches in a season"""
         if self.inference == False:
             season = self.config["season"] or "2024-2025"
@@ -191,7 +192,7 @@ class FBRefScraper:
         # TODO: grab last n game_week data instead of last 60
         # for inference select last 100 matches
         if self.inference == True:
-            match_links = match_links[-10:]
+            match_links = match_links[-60:]
             total_matches = len(match_links)
 
         print(f"Found {total_matches} matches to scrape")
@@ -217,6 +218,7 @@ class FBRefScraper:
 
 def main():
     try:
+        # .parent cuts of the last value after /
         main_dir = Path(__file__).resolve().parent.parent.parent
         config = main_dir / "config" / "config.yaml"
         scraper = FBRefScraper(config)
