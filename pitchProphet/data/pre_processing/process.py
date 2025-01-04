@@ -93,7 +93,7 @@ class Process:
         print("\nIndices verification passed: All DataFrames have matching indices")
         return
 
-    def save_file(self, save_dir):
+    def save_file(self, inference: bool, paths):
         """save the processed dataframes with row counts in filenames"""
 
         home_rows = len(self.all_home_stats)
@@ -104,7 +104,10 @@ class Process:
         match_week = self.match_info_df["Matchweek"].iloc[-1]
 
         # check directory and make math
-        save_dir = Path(save_dir)
+        save_dir = Path(paths["root_dir"]) / Path(paths["processed_dir"])
+        if inference == True:
+            save_dir = Path(paths["root_dir"]) / Path(paths["inf_out_dir"])
+
         save_dir.mkdir(exist_ok=True, parents=True)
 
         self.all_home_stats.to_csv(

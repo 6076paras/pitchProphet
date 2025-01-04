@@ -9,19 +9,19 @@ It implements a pipeline that:
    and general match information with outcome labels
 """
 
+from pathlib import Path
+
 from pitchProphet.data.pre_processing.load_data import LoadData
 from pitchProphet.data.pre_processing.process import Process
 
 
 def main() -> None:
 
-    json_path = "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/data/fbref/raw/team_data"
-    config_path = (
-        "/Users/paraspokharel/Programming/pitchProphet/pitchProphet/config/config.yaml"
-    )
+    main_dir = Path(__file__).resolve().parent.parent.parent
+    config_path = main_dir / "config" / "config.yaml"
 
     # convert json game data into multi-indexed dataframe
-    ld_data = LoadData(json_path, config_path)
+    ld_data = LoadData(config_path)
     data = ld_data.game_data_process()
 
     # calculate descriptive stats  for all matches
@@ -32,7 +32,9 @@ def main() -> None:
     # one with general game information for y label and other 2 home home and
     # away teams descriptive statiscs for all features to be used as x variable for training
     process_games.final_dataframe()
-    process_games.save_file(ld_data.config["out_dir"])
+    inference = ld_data.inference
+    paths = ld_data.paths
+    process_games.save_file(inference, paths)
 
 
 if __name__ == "__main__":

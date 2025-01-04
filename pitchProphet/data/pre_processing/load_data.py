@@ -1,5 +1,6 @@
 import glob
 import json
+from pathlib import Path
 from typing import List
 
 import pandas as pd
@@ -12,7 +13,7 @@ class LoadData:
     fbref.com to pandas dataframe.
 
     Attributes:
-        json_dir (str): Path to the JSON file with match data.
+        raw_dir (str): Path to the JSON file with match data.
         config_path (str): Path to the YAML configuration file.
     Methods:
         game_data_process() -> pd.DataFrame:
@@ -21,17 +22,35 @@ class LoadData:
 
     def __init__(
         self,
-        json_dir: str,
         config_path: str,
         league: str = None,
         match_week: int = None,
+        player_data: bool = False,
+        inference: bool = True,
     ):
-        self.json_dir = json_dir
         self.config_path = config_path
         self.league = league
         self.match_week = match_week
+        self.player_data = player_data
+        self.inference = inference
+        self.all_config = self._open_yaml(self.config_path)
+        self.config = self.all_config["processing"]
+        self.paths = self.all_config["global"]["paths"]
+        self.raw_dir = (
+            Path(self.paths["root_dir"]) / Path(self.paths["raw_dir"]) / "team_data"
+        )
+        if self.player_data == True:
+            self.raw_dir = (
+                Path(self.paths["root_dir"])
+                / Path(self.paths["raw_dir"])
+                / "team_and_player_data"
+            )
+        if self.inference == True:
+            self.raw_dir = (
+                Path(self.paths["root_dir"]) / Path(self.paths["raw_dir"]) / "inference"
+            )
+
         self.data = self._open_json(self._find_relv_files())
-        self.config = self._open_yaml(self.config_path)["processing"]
 
     def game_data_process(self) -> pd.DataFrame:
         """
@@ -82,7 +101,7 @@ class LoadData:
 
     def _find_relv_files(self):
         """iterate through raw file dir and return relevant files based on filters"""
-        pattern = f"{self.json_dir}/*.json"
+        pattern = f"{self.raw_dir}/*.json"
 
         str_match_week = str(self.match_week)
         # get all JSON files and retrun if no filters

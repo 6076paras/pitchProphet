@@ -54,39 +54,28 @@ processing:
 
   # variables to process
   x_vars:
-    # scoring metrics
-    - Gls     # Goals
+    - Gls     # Goals -------Scoring Metrics------------
     - Ast     # Assists
     - PK      # Penalties
     - PKatt   # Penalty attempts
     - xG      # Expected goals
     - npxG    # Non-penalty xG
     - xAG     # Expected assisted goals
-    
-    # shooting metrics
-    - Sh      # Shots
+    - Sh      # Shots------  Shooting Metrics-----------
     - SoT     # Shots on target
-    
-    # disciplinary metrics
-    - CrdY    # Yellow cards
+    - CrdY    # Yellow cards--Disciplinary Metrics------
     - CrdR    # Red cards
-    
-    # possession metrics
-    - Touches
-    - Carries
+    - Touches #--------   Possession Metrics------------
+    - Carries 
     - PrgC    # Progressive carries
     - Cmp     # Passes completed
     - Att     # Passes attempted
     - Cmp%    # Pass completion %
     - PrgP    # Progressive passes
-    
-    # defensive metrics
-    - Tkl     # Tackles
+    - Tkl     # Tackles ------Devensive Metrics----------
     - Int     # Interceptions
     - Blocks
-    
-    # creation metrics
-    - SCA     # Shot-creating actions
+    - SCA     # Shot-creating actions--Creation Metrics---
     - GCA     # Goal-creating actions
     - Succ    # Successful actions
 

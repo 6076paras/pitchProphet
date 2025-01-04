@@ -81,7 +81,7 @@ def load_data(inference_raw_pth, config_path, league=None, match_week=None):
     # load data with optional league and match week filters
     inference_raw_pth = str(inference_raw_pth)
     ld_data = LoadData(
-        inference_raw_pth, config_path, league=league, match_week=match_week
+        config_path, league=league, match_week=match_week, inference=True
     )
     data = ld_data.game_data_process()
     return data
