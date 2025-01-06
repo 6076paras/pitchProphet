@@ -135,7 +135,7 @@ This processed data feeds directly into the web application, which displays the 
 
 ### Web Application
 
-The web application provides an intuitive interface to view match predictions for all major European leagues. Built with Flask, it displays prediction probabilities for upcoming fixtures in each league. You can explore the prediction results on the web application [here](http://ec2-35-170-244-111.compute-1.amazonaws.com/).
+The web application provides an intuitive interface to view match predictions for all major European leagues. Built with Flask, it displays prediction probabilities for upcoming fixtures in each league. You can explore the prediction results on the web application [here](http://ec2-34-205-64-226.compute-1.amazonaws.com/).
 
 #### Local Development
 To start the web application locally:
