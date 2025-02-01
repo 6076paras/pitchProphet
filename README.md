@@ -1,11 +1,5 @@
 Welcome to the pitchProphet. This documentation will guide you through the setup, usage, and development of the project.
 
-
-# Project Status 🚧
-
-This project is under active development, with features being added and updated regularly. While predictions currently rely on team-level features, the ultimate goal of this project is to experiement and research with player-level data and advanced ML modeling that capturues the symmetry and patters of the data for more accurate predictions.
-
-
 ## Table of Contents
 
 1. [Introduction](#introduction)
